@@ -8,7 +8,7 @@ func load_map(filename : String) -> Dictionary:
 	
 	var column_count : int = 0
 	var timing_points : Array[Dictionary]
-	var hit_objects : Array[Dictionary]
+	var hit_objects = []
 	
 	var section = ParseSection.NONE
 	
@@ -39,6 +39,9 @@ func load_map(filename : String) -> Dictionary:
 				var count = key_value[1].to_int()
 				assert(count > 0)
 				column_count = count;
+				
+				for i in range(count):
+					hit_objects.append([])
 			
 		elif section == ParseSection.TIMING_POINTS:
 			var params = line.split(",", true)
@@ -86,7 +89,7 @@ func load_map(filename : String) -> Dictionary:
 				end_time = float(temp[0].to_int()) / 1000.0
 				assert(end_time > start_time)
 			
-			hit_objects.append({ "column": col, "start_time": start_time, "end_time": end_time, "is_hold": is_hold })
+			hit_objects[col].append({ "column": col, "start_time": start_time, "end_time": end_time, "is_hold": is_hold })
 	
 	file.close()
 	

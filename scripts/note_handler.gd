@@ -1,11 +1,15 @@
 extends Node
 
-const SCROLL_SPEED : float = 15.0
+const SCROLL_SPEED : float = 25.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
+@onready var ui : Control = $UI
 @onready var playfield : Node3D = $Playfield
 @onready var note_group : Node3D = $Notes;
+
 var note_scene : Resource = preload("res://scenes/note.tscn")
+
+var hit_objects : Array;
 
 func _ready() -> void:
 	assert(note_group != null)
@@ -15,15 +19,33 @@ func _ready() -> void:
 	
 	playfield.set_key_count(map["key_count"])
 	
-	for obj in map["hit_objects"]:
-		spawn_note_at(obj["column"], obj["start_time"], obj["end_time"])
-		
-	#spawn_note_at(0, 0)
+	hit_objects = map["hit_objects"]
+	check_note_spawns()
 
 func _process(delta : float) -> void:
+	check_note_spawns()
+	
 	for note in note_group.get_children():
 		var note_pos = get_note_pos(note.time, audio_handler.get_playback_position())
 		note.position = Vector3(note.position.x, note.position.y, note_pos)
+		
+		if note.get_end_point() <= -10.0:
+			note.queue_free()
+
+func check_note_spawns() -> void:
+	for i in range(playfield.key_count):
+		var col_list = hit_objects[i]
+		while len(col_list) > 0:
+			var obj = col_list[0]
+			
+			var note_pos = get_note_pos(obj["start_time"], audio_handler.get_playback_position())
+			if note_pos > playfield.FIELD_SPAWN_LENGTH:
+				break
+				
+			col_list.pop_front()
+			spawn_note_at(obj["column"], obj["start_time"], obj["end_time"])
+			
+	ui.spawned_notes = note_group.get_child_count()
 
 func get_note_pos(time : float, offset : float = 0.0) -> float:
 	return (time - offset) * SCROLL_SPEED + playfield.RECEPTOR_OFFSET

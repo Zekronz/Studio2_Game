@@ -11,14 +11,25 @@ var time : float = 0
 var length : float = 0
 var is_hold : bool = false
 
+var main : Node3D
+var hold : Node3D
+
 func init(n_time : float, n_length : float, n_is_hold : bool, hold_length) -> void:
+	main = $Main
+	hold = $Hold
+	
 	time = n_time
 	length = n_length
 	is_hold = n_is_hold
 	
-	$Main.scale = Vector3(NOTE_WIDTH, NOTE_HEIGHT, NOTE_BASE_LENGTH)
+	main.scale = Vector3(NOTE_WIDTH, NOTE_HEIGHT, NOTE_BASE_LENGTH)
 	
 	if is_hold:
-		$Hold.visible = true
-		$Hold.scale = Vector3(HOLD_WIDTH, HOLD_HEIGHT, hold_length)
+		hold.visible = true
+		hold.scale = Vector3(HOLD_WIDTH, HOLD_HEIGHT, hold_length)
 	
+func get_end_point() -> float:
+	if not is_hold:
+		return position.z + NOTE_BASE_LENGTH
+		
+	return position.z + hold.scale.z

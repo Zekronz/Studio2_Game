@@ -2,7 +2,8 @@ extends Node3D
 
 var key_count : int = 4
 
-const FIELD_LENGTH : float = 100
+const FIELD_LENGTH : float = 50
+const FIELD_SPAWN_LENGTH : float = FIELD_LENGTH + 10.0
 var field_width : float = 0
 
 const COLUMN_WIDTH : float = 0.85
