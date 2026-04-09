@@ -1,0 +1,17 @@
+[gd_scene format=3 uid="uid://crmngu7npw4xe"]
+
+[ext_resource type="Script" uid="uid://djqw62l5u2hsi" path="res://scripts/note.gd" id="1_t3yvt"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_7buut"]
+size = Vector3(1, 0.25, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7buut"]
+albedo_color = Color(0.24705882, 0.31764707, 1, 1)
+
+[node name="Note" type="Node3D" unique_id=34288547]
+script = ExtResource("1_t3yvt")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=848404269]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.125, 0.25)
+mesh = SubResource("BoxMesh_7buut")
+surface_material_override/0 = SubResource("StandardMaterial3D_7buut")
