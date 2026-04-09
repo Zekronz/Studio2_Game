@@ -1,0 +1,39 @@
+[gd_scene format=3 uid="uid://df28ml7rjtd3o"]
+
+[ext_resource type="Script" uid="uid://cfxwocljgerwa" path="res://scripts/playfield.gd" id="1_w0clp"]
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_mpw7g"]
+size = Vector2(1, 1)
+center_offset = Vector3(0, 0, 0.5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mpw7g"]
+albedo_color = Color(0, 0.11974215, 0.3201409, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_mpw7g"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_y4l6t"]
+albedo_color = Color(0.15301332, 0.1368, 0.38, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w0clp"]
+albedo_color = Color(0.15294118, 0.13725491, 0.38039216, 1)
+
+[node name="Playfield" type="Node3D" unique_id=1342724330]
+script = ExtResource("1_w0clp")
+
+[node name="Floor" type="MeshInstance3D" parent="." unique_id=1083664172]
+mesh = SubResource("PlaneMesh_mpw7g")
+surface_material_override/0 = SubResource("StandardMaterial3D_mpw7g")
+
+[node name="Left" type="MeshInstance3D" parent="." unique_id=1248422450]
+transform = Transform3D(0.05, 0, 0, 0, 0.2, 0, 0, 0, 1, 0.525, 0, 0.5)
+mesh = SubResource("BoxMesh_mpw7g")
+surface_material_override/0 = SubResource("StandardMaterial3D_y4l6t")
+
+[node name="Right" type="MeshInstance3D" parent="." unique_id=397819657]
+transform = Transform3D(0.05, 0, 0, 0, 0.2, 0, 0, 0, 1, -0.525, 0, 0.5)
+mesh = SubResource("BoxMesh_mpw7g")
+surface_material_override/0 = SubResource("StandardMaterial3D_w0clp")
+
+[node name="Receptor" type="MeshInstance3D" parent="." unique_id=523772853]
+transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 0.05, 0, 0, -0.025)
+mesh = SubResource("BoxMesh_mpw7g")

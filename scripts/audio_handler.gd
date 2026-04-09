@@ -4,7 +4,7 @@ const BPM : float = 222.0
 var beat_length : float = (60.0 / BPM)
 
 func _ready() -> void:
-	self.volume_db = -15.0
+	self.volume_db = -25.0
 	self.play(0)
 
 func _process(delta: float) -> void:
