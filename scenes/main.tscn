@@ -1,8 +1,8 @@
 [gd_scene format=3 uid="uid://b20yqow6buqas"]
 
-[ext_resource type="AudioStream" uid="uid://y1h867ejwm6v" path="res://maps/Finixe/audio.mp3" id="1_o5qli"]
 [ext_resource type="Script" uid="uid://dd1yxoeg7haqn" path="res://scripts/note_handler.gd" id="1_sugp2"]
 [ext_resource type="Script" uid="uid://bus1pjjnr0q1v" path="res://scripts/audio_handler.gd" id="2_0wfyh"]
+[ext_resource type="AudioStream" uid="uid://dxhsk3uxsp21f" path="res://maps/Testify/audio.ogg" id="2_sugp2"]
 
 [sub_resource type="Environment" id="Environment_sugp2"]
 background_mode = 1
@@ -15,7 +15,7 @@ size = Vector3(4, 0.125, 0.125)
 script = ExtResource("1_sugp2")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1564940707]
-stream = ExtResource("1_o5qli")
+stream = ExtResource("2_sugp2")
 script = ExtResource("2_0wfyh")
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1084176415]
@@ -23,9 +23,11 @@ environment = SubResource("Environment_sugp2")
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1487801197]
 transform = Transform3D(0.52937156, -0.35537502, 0.77037287, 0, 0.9080408, 0.41888162, -0.84839016, -0.22174402, 0.480691, 2.3051422, 1.2533952, 1.4383438)
+light_energy = 1.95
 
 [node name="Camera" type="Camera3D" parent="." unique_id=1040328166]
-transform = Transform3D(-1, 0, 8.742278e-08, 2.262668e-08, 0.9659258, 0.25881904, -8.444392e-08, 0.25881904, -0.9659258, 0, 1.9586766, -1.7235594)
+transform = Transform3D(-1, 1.0955303e-14, 8.742278e-08, 5.3053625e-08, 0.7948067, 0.60686266, -6.94842e-08, 0.60686266, -0.7948067, 0, 2.5227208, -0.7481267)
+far = 50.0
 
 [node name="HitLine" type="MeshInstance3D" parent="." unique_id=2101293635]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.062, 0.062)
