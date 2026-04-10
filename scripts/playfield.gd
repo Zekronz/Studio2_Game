@@ -7,7 +7,7 @@ const FIELD_SPAWN_POS : float = FIELD_LENGTH + 10.0
 const FIELD_DESPAWN_POS : float = -10.0
 var field_width : float = 0
 
-const COLUMN_WIDTH : float = 0.85
+const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
 
 const RECEPTOR_OFFSET : float = 0.5

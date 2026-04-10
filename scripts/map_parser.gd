@@ -2,7 +2,7 @@ extends Node
 
 enum ParseSection { NONE, DIFFICULTY, HIT_OBJECTS, TIMING_POINTS }
 
-func load_map(filename : String) -> Dictionary:
+func load_map(filename : String, convert_hold_to_single : bool = false) -> Dictionary:
 	var file = FileAccess.open(filename, FileAccess.READ)
 	assert(file != null)
 	
@@ -78,7 +78,7 @@ func load_map(filename : String) -> Dictionary:
 			
 			assert(params[3].is_valid_int())
 			var type = params[3].to_int()
-			var is_hold : bool = (type & (1 << 7))
+			var is_hold : bool = (not convert_hold_to_single) and (type & (1 << 7))
 			
 			if is_hold:
 				assert(params.size() >= 6)
