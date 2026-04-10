@@ -1,6 +1,6 @@
 extends Node
 
-const SCROLL_SPEED : float = 25.0
+const SCROLL_SPEED : float = 15.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
 @onready var ui : Control = $UI
@@ -14,8 +14,8 @@ var hit_objects : Array;
 func _ready() -> void:
 	assert(note_group != null)
 	
-	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Fatalism].osu")
-	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [ShuChan!!].osu")
+	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Fatalism].osu")
+	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [ShuChan!!].osu")
 	
 	playfield.set_key_count(map["key_count"])
 	
@@ -29,7 +29,7 @@ func _process(delta : float) -> void:
 		var note_pos = get_note_pos(note.time, audio_handler.get_playback_position())
 		note.position = Vector3(note.position.x, note.position.y, note_pos)
 		
-		if note.get_end_point() <= -10.0:
+		if note.get_end_point() <= playfield.FIELD_DESPAWN_POS:
 			note.queue_free()
 
 func check_note_spawns() -> void:
@@ -38,12 +38,13 @@ func check_note_spawns() -> void:
 		while len(col_list) > 0:
 			var obj = col_list[0]
 			
-			var note_pos = get_note_pos(obj["start_time"], audio_handler.get_playback_position())
-			if note_pos > playfield.FIELD_SPAWN_LENGTH:
+			var note_pos = get_note_pos(obj["start_time"], audio_handler.get_playback_position())	
+			if note_pos > playfield.FIELD_SPAWN_POS:
 				break
 				
 			col_list.pop_front()
-			spawn_note_at(obj["column"], obj["start_time"], obj["end_time"])
+			if note_pos > playfield.FIELD_DESPAWN_POS:
+				spawn_note_at(obj["column"], obj["start_time"], obj["end_time"])
 			
 	ui.spawned_notes = note_group.get_child_count()
 

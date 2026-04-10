@@ -5,7 +5,7 @@ var beat_length : float = (60.0 / BPM)
 
 func _ready() -> void:
 	self.volume_db = -25.0
-	self.play(0)
+	self.play(15)
 
 func _process(delta: float) -> void:
 	pass
