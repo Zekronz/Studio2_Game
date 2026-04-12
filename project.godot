@@ -22,6 +22,10 @@ Judge="*uid://bbquvwmftpfud"
 InputHandler="*uid://ca61kmcxqe66q"
 NoteInfo="*uid://cprsotaj8ruew"
 
+[display]
+
+window/vsync/vsync_mode=0
+
 [physics]
 
 3d/physics_engine="Jolt Physics"

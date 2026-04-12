@@ -9,7 +9,7 @@ const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
 var num_columns : int = InputHandler.key_count
 
-const RECEPTOR_OFFSET : float = 0.2
+const RECEPTOR_OFFSET : float = 1.0
 
 @onready var floor_mesh : MeshInstance3D = $Floor
 @onready var left_mesh : MeshInstance3D = $Left
@@ -55,7 +55,7 @@ func update_playfield_transform() -> void:
 	floor_mesh.scale = Vector3(field_width, 1, FIELD_LENGTH)
 	
 	receptor_mesh.scale = Vector3(field_width, receptor_mesh.scale.y, receptor_mesh.scale.z)
-	receptor_mesh.position = RECEPTOR_OFFSET * Vector3.BACK
+	receptor_mesh.position = Vector3(0.0, -0.09, RECEPTOR_OFFSET)
 	
 	left_mesh.scale = Vector3(left_mesh.scale.x, left_mesh.scale.y, FIELD_LENGTH)
 	left_mesh.position = Vector3((field_width / 2) + (left_mesh.scale.x / 2), left_mesh.position.y, (FIELD_LENGTH / 2))

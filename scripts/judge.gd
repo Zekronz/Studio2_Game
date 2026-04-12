@@ -9,9 +9,18 @@ enum {
 	MISS
 }
 
+#OD8
+#const SEC : Dictionary = {
+	#PERFECT: 16.5 / 1000.0,
+	#GREAT: 40.5 / 1000.0,
+	#GOOD: 73.5 / 1000.0,
+	#OK: 103.5 / 1000.0,
+	#BAD: 127.5 / 1000.0
+#}
+
 const SEC : Dictionary = {
-	PERFECT: 16.5 / 1000.0,
-	GREAT: 40.5 / 1000.0,
+	PERFECT: 25.5 / 1000.0,
+	GREAT: 55.5 / 1000.0,
 	GOOD: 73.5 / 1000.0,
 	OK: 103.5 / 1000.0,
 	BAD: 127.5 / 1000.0

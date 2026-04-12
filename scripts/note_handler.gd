@@ -5,8 +5,8 @@ extends Node
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
 
-const SCROLL_SPEED : float = 20.0
-const VISUAL_OFFSET : float = 20.0 / 1000.0
+const SCROLL_SPEED : float = 18.0
+const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
 @onready var ui : Control = $UI
@@ -21,6 +21,7 @@ var total_hits : int = 0
 var hit_score : int = 0
 var accuracy : float = 0
 var hit_deviation : float = 0
+var combo : int = 0
 
 func _ready() -> void:
 	assert(note_group != null)
@@ -73,7 +74,7 @@ func load_map():
 	
 	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")	
+	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu", true)
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -88,7 +89,9 @@ func load_map():
 	
 	total_hits = 0
 	hit_score = 0
-	accuracy = 0.0
+	accuracy = 0
+	hit_deviation = 0
+	combo = 0
 	
 	check_note_spawns()
 	map_loaded = true
@@ -240,7 +243,8 @@ func note_hit(time_delta : float) -> void:
 	assert(judge != Judge.MISS)
 	add_hit(judge, time_delta)
 	
-func add_hit(judge, time_delta, show_ui : bool = true) -> void:
+func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
+	time_delta /= audio_handler.pitch_scale
 	total_hits += 1
 	
 	hit_score += Judge.SCORE[judge]
@@ -250,5 +254,12 @@ func add_hit(judge, time_delta, show_ui : bool = true) -> void:
 	hit_deviation += time_delta;
 	ui.set_hit_average(hit_deviation / float(total_hits))
 	
-	if show_ui:
+	if judge == Judge.MISS:
+		combo = 0
+	else:
+		combo += 1
+	
+	ui.set_combo(combo)
+	
+	if show_judge_ui:
 		ui.set_judge(judge)
