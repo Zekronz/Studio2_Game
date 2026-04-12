@@ -26,14 +26,17 @@ surface_material_override/0 = ExtResource("2_y4l6t")
 
 [node name="Left" type="MeshInstance3D" parent="." unique_id=1248422450]
 transform = Transform3D(0.05, 0, 0, 0, 0.2, 0, 0, 0, 1, 0.525, 0, 0.5)
+visible = false
 mesh = SubResource("BoxMesh_mpw7g")
 surface_material_override/0 = SubResource("StandardMaterial3D_y4l6t")
 
 [node name="Right" type="MeshInstance3D" parent="." unique_id=397819657]
 transform = Transform3D(0.05, 0, 0, 0, 0.2, 0, 0, 0, 1, -0.525, 0, 0.5)
+visible = false
 mesh = SubResource("BoxMesh_mpw7g")
 surface_material_override/0 = SubResource("StandardMaterial3D_w0clp")
 
 [node name="Receptor" type="MeshInstance3D" parent="." unique_id=523772853]
 transform = Transform3D(1, 0, 0, 0, 0.2, 0, 0, 0, 0.05, 0, 0, -0.025)
+visible = false
 mesh = SubResource("BoxMesh_mpw7g")

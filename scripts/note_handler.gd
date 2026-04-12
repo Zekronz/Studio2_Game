@@ -72,9 +72,9 @@ func load_map():
 	for column in note_group.get_children():
 		column.queue_free()
 	
-	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu", true)
+	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu", true)
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -252,7 +252,7 @@ func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
 	ui.set_accuracy(accuracy)
 	
 	hit_deviation += time_delta;
-	ui.set_hit_average(hit_deviation / float(total_hits))
+	ui.set_hit_average(-(hit_deviation / float(total_hits)))
 	
 	if judge == Judge.MISS:
 		combo = 0

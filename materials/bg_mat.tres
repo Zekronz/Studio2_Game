@@ -1,0 +1,8 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://ctxl8h8c4ekyx"]
+
+[ext_resource type="Shader" uid="uid://clsfrw16ollsf" path="res://shaders/bg_shader.gdshader" id="1_sp3go"]
+
+[resource]
+shader = ExtResource("1_sp3go")
+shader_parameter/top_color = Color(0.05490196, 0.047058824, 0.05490196, 1)
+shader_parameter/bottom_color = Color(0.08235294, 0.019607844, 0.03529412, 1)

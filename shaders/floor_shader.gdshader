@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley;
+render_mode blend_mix, depth_draw_always, cull_back, diffuse_burley;
 
 uniform vec4 albedo : source_color;
 
@@ -21,7 +21,17 @@ void fragment() {
 		col = albedo.rgb + (vec3(0.059, 0.192, 0.278) * (fade * fade * pressed)) / 2.0;
 	}
 	
-	ALBEDO = col;
+	//@TODO: Outline should be outside of field.
+	float px = fwidth(UV.x);
+	float thickness = 1.0 * px;
+	float aa = px * 0.5;
+	float edge = min(UV.x, 1.0 - UV.x);
+	float outline = 1.0 - smoothstep(thickness, thickness + aa, edge);
+	float receptor = 0.0;//1.0 - smoothstep(thickness, thickness + aa, UV.y + receptor_offset);
+	
+	//@TODO: Bg color.
+	ALBEDO = vec3(clamp(outline + receptor, 0.0, 1.0));
+	ALPHA = albedo.a;
 
 	METALLIC = 0.0;
 	SPECULAR = 0.0;
