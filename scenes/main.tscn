@@ -2,7 +2,7 @@
 
 [ext_resource type="Script" uid="uid://dd1yxoeg7haqn" path="res://scripts/note_handler.gd" id="1_sugp2"]
 [ext_resource type="Script" uid="uid://bus1pjjnr0q1v" path="res://scripts/audio_handler.gd" id="2_0wfyh"]
-[ext_resource type="AudioStream" uid="uid://dxhsk3uxsp21f" path="res://maps/Testify/audio.ogg" id="3_tefeu"]
+[ext_resource type="AudioStream" uid="uid://y1h867ejwm6v" path="res://maps/Finixe/audio.mp3" id="2_tbgi4"]
 [ext_resource type="PackedScene" uid="uid://df28ml7rjtd3o" path="res://scenes/playfield.tscn" id="4_jyhfs"]
 [ext_resource type="Script" uid="uid://d2lbtnetbldka" path="res://scripts/ui.gd" id="5_tbgi4"]
 
@@ -20,7 +20,8 @@ fog_depth_end = 24.0
 script = ExtResource("1_sugp2")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1564940707]
-stream = ExtResource("3_tefeu")
+stream = ExtResource("2_tbgi4")
+pitch_scale = 0.75
 script = ExtResource("2_0wfyh")
 
 [node name="UI" type="Control" parent="." unique_id=603293639]

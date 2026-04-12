@@ -26,15 +26,23 @@ const SCORE : Dictionary = {
 	MISS: 0
 }
 
-func time_to_judgement(time : float):
-	if time <= SEC[PERFECT]:
+func time_to_judgement(delta : float, scale : float = 1.0):
+	if delta <= SEC[PERFECT] * scale:
 		return PERFECT
-	elif time <= SEC[GREAT]:
+	elif delta <= SEC[GREAT] * scale:
 		return GREAT
-	elif time <= SEC[GOOD]:
+	elif delta <= SEC[GOOD] * scale:
 		return GOOD
-	elif time <= SEC[OK]:
+	elif delta <= SEC[OK] * scale:
 		return OK
-	elif time <= SEC[BAD]:
+	elif delta <= SEC[BAD] * scale:
 		return BAD
 	return MISS
+
+func time_behind(delta : float, judgement, scale : float = 1.0):
+	assert(judgement != MISS)
+	return (delta < -(SEC[judgement] * scale))
+
+func time_ahead(delta : float, judgement, scale : float = 1.0):
+	assert(judgement != MISS)
+	return (delta > (SEC[judgement] * scale))

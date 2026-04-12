@@ -9,7 +9,7 @@ const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
 var num_columns : int = InputHandler.key_count
 
-const RECEPTOR_OFFSET : float = 0.5
+const RECEPTOR_OFFSET : float = 0.2
 
 @onready var floor_mesh : MeshInstance3D = $Floor
 @onready var left_mesh : MeshInstance3D = $Left

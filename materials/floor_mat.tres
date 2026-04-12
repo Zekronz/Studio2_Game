@@ -1,0 +1,21 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://df58at7t6ke12"]
+
+[ext_resource type="Shader" uid="uid://bib80xgoiebjt" path="res://shaders/floor_shader.gdshader" id="1_4srll"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_4srll")
+shader_parameter/albedo = Color(0, 0.11974215, 0.3201409, 1)
+shader_parameter/albedo_texture_size = Vector2i(0, 0)
+shader_parameter/point_size = 1.0
+shader_parameter/roughness = 1.0
+shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
+shader_parameter/specular = 0.0
+shader_parameter/metallic = 0.0
+shader_parameter/uv1_scale = Vector3(1, 1, 1)
+shader_parameter/uv1_offset = Vector3(0, 0, 0)
+shader_parameter/uv2_scale = Vector3(1, 1, 1)
+shader_parameter/uv2_offset = Vector3(0, 0, 0)
+shader_parameter/receptor_offset = 0.0
+shader_parameter/key_count = 0.0
+shader_parameter/key_press = 0

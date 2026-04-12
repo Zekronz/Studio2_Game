@@ -8,7 +8,8 @@ var is_hold : bool = false
 var pressed : bool = false
 var holding : bool = false
 var active : bool = true
-var missed : bool = false
+var missed_start : bool = false
+var missed_end : bool = false
 
 var main : Node3D
 var hold : Node3D
@@ -39,7 +40,12 @@ func set_holding(n_holding : bool):
 	holding = n_holding
 	hold_mesh.set_instance_shader_parameter("holding", n_holding)
 
-func set_missed():
-	missed = true
+func set_missed_start():
+	missed_start = true
+	if is_hold:
+		hold_mesh.set_instance_shader_parameter("missed", true)
+
+func set_missed_end():
+	missed_end = true
 	if is_hold:
 		hold_mesh.set_instance_shader_parameter("missed", true)
