@@ -5,7 +5,8 @@ extends Node
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
 
-const SCROLL_SPEED : float = 12.0
+const SCROLL_SPEED : float = 20.0
+const VISUAL_OFFSET : float = 20.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
 @onready var ui : Control = $UI
@@ -19,6 +20,7 @@ var column_pressed : int = 0
 var total_hits : int = 0
 var hit_score : int = 0
 var accuracy : float = 0
+var hit_deviation : float = 0
 
 func _ready() -> void:
 	assert(note_group != null)
@@ -98,10 +100,12 @@ func check_note_spawns() -> void:
 		while len(col_list) > 0:
 			var obj = col_list[0]
 			
-			var time_delta = obj["start_time"] - audio_handler.get_playback_position()
+			var start_delta = obj["start_time"] - audio_handler.get_playback_position()
+			var end_delta = (obj["start_time"] + obj["time_length"]) - audio_handler.get_playback_position()
+			
 			var note_pos = get_note_pos(obj["start_time"])
 			
-			if note_pos > playfield.FIELD_SPAWN_POS and Judge.time_ahead(time_delta, Judge.BAD, audio_handler.pitch_scale):
+			if note_pos > playfield.FIELD_SPAWN_POS and Judge.time_ahead(start_delta, Judge.BAD, audio_handler.pitch_scale):
 				break
 				
 			col_list.pop_front()
@@ -109,31 +113,30 @@ func check_note_spawns() -> void:
 			var miss_start = false
 			var miss_end = false
 			
-			if Judge.time_behind(time_delta, Judge.BAD, audio_handler.pitch_scale):
+			if Judge.time_behind(start_delta, Judge.BAD, audio_handler.pitch_scale):
 				miss_start = true
 				
 			var is_hold = (obj["time_length"] > 0)
-			if is_hold:
-				var end_time = obj["start_time"] + obj["time_length"]
-				var end_delta = end_time - audio_handler.get_playback_position()
-				if Judge.time_behind(end_delta, Judge.BAD, audio_handler.pitch_scale):
+			if is_hold and Judge.time_behind(end_delta, Judge.BAD, audio_handler.pitch_scale):
 					miss_end = true
 					
 			if miss_start:
-				add_hit(Judge.MISS, false)
+				add_hit(Judge.MISS, start_delta, false)
 				
 			if miss_end:
-				add_hit(Judge.MISS, false)
+				add_hit(Judge.MISS, end_delta, false)
 			
 			if not miss_start or (not miss_end and is_hold):
 				spawn_note_at(obj["column"], obj["start_time"], obj["time_length"])
 	
-	ui.spawned_notes = 0
+	var num_notes : int = 0
 	for column in note_group.get_children():
-		ui.spawned_notes += column.get_child_count()
+		num_notes += column.get_child_count()
+	
+	ui.set_spawned_notes(num_notes)
 
 func get_note_pos(time : float) -> float:
-	return (time - audio_handler.get_playback_position()) * (SCROLL_SPEED / audio_handler.pitch_scale) + playfield.RECEPTOR_OFFSET
+	return (time - audio_handler.get_playback_position() - VISUAL_OFFSET) * (SCROLL_SPEED / audio_handler.pitch_scale) + playfield.RECEPTOR_OFFSET
 
 func get_note_end_point(start_time : float, time_length : float = -1) -> float:
 	if time_length <= 0.0:
@@ -177,7 +180,7 @@ func handle_note_miss_start(note) -> void:
 	if miss_start:
 		note.set_pressed()
 		note.set_missed_start()
-		add_hit(Judge.MISS)
+		add_hit(Judge.MISS, start_delta)
 		
 func handle_note_miss_end(note) -> void:
 	assert(note.active)
@@ -190,7 +193,7 @@ func handle_note_miss_end(note) -> void:
 	if miss_end:
 		note.set_holding(false)
 		note.set_missed_end()
-		add_hit(Judge.MISS)
+		add_hit(Judge.MISS, end_delta)
 
 func handle_note_judgement_start(note) -> void:
 	assert(note.active)
@@ -230,17 +233,22 @@ func handle_note_judgement_end(note) -> void:
 		else:
 			destroy_note(note)
 		
-		add_hit(judge)
+		add_hit(judge, end_delta)
 
 func note_hit(time_delta : float) -> void:
 	var judge = Judge.time_to_judgement(abs(time_delta), audio_handler.pitch_scale)
 	assert(judge != Judge.MISS)
-	add_hit(judge)
+	add_hit(judge, time_delta)
 	
-func add_hit(judge, show_ui : bool = true) -> void:
+func add_hit(judge, time_delta, show_ui : bool = true) -> void:
 	total_hits += 1
+	
 	hit_score += Judge.SCORE[judge]
 	accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
 	ui.set_accuracy(accuracy)
+	
+	hit_deviation += time_delta;
+	ui.set_hit_average(hit_deviation / float(total_hits))
+	
 	if show_ui:
 		ui.set_judge(judge)
