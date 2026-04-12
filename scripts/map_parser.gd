@@ -74,7 +74,7 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 			
 			assert(params[2].is_valid_int())
 			var start_time = float(params[2].to_int()) / 1000.0
-			var end_time = -1
+			var time_length = -1.0
 			
 			assert(params[3].is_valid_int())
 			var type = params[3].to_int()
@@ -86,10 +86,10 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 				assert(temp.size() > 0)
 				assert(temp[0].is_valid_int())
 				
-				end_time = float(temp[0].to_int()) / 1000.0
-				assert(end_time > start_time)
+				time_length = (float(temp[0].to_int()) / 1000.0) - start_time
+				assert(time_length > 0.0)
 			
-			hit_objects[col].append({ "column": col, "start_time": start_time, "end_time": end_time, "is_hold": is_hold })
+			hit_objects[col].append({ "column": col, "start_time": start_time, "time_length": time_length, "is_hold": is_hold })
 	
 	file.close()
 	

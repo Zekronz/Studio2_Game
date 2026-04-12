@@ -2,6 +2,7 @@ extends Control
 
 @onready var fps_label = $FPSLabel
 @onready var judge_label = $JudgementLabel
+@onready var acc_label = $AccLabel
 
 var spawned_notes : int = 0
 
@@ -29,3 +30,6 @@ func set_judge(judge) -> void:
 	judge_timer = JUDGE_TIME
 	judge_label.text = JUDGE_TEXT[judge]
 	judge_label.visible = true
+	
+func set_accuracy(accuracy : float) -> void:
+	acc_label.text = str(accuracy * 100).pad_decimals(2) + "%"

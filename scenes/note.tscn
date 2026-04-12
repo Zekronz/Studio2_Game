@@ -1,71 +1,10 @@
 [gd_scene format=3 uid="uid://crmngu7npw4xe"]
 
-[ext_resource type="Script" uid="uid://djqw62l5u2hsi" path="res://scripts/note.gd" id="1_t3yvt"]
+[ext_resource type="Script" uid="uid://djqw62l5u2hsi" path="res://scripts/note_object.gd" id="1_t3yvt"]
+[ext_resource type="Material" uid="uid://cyc8jrvg3t1fd" path="res://materials/note_mat.tres" id="2_43c4j"]
+[ext_resource type="Material" uid="uid://xlk2jnr2p1tq" path="res://materials/hold_mat.tres" id="3_njo4t"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_7buut"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7buut"]
-albedo_color = Color(0.060000002, 0.15400016, 1, 1)
-metallic_specular = 0.0
-
-[sub_resource type="Shader" id="Shader_t3yvt"]
-code = "shader_type spatial;
-render_mode blend_mix, depth_draw_opaque, cull_back, diffuse_burley, specular_schlick_ggx;
-
-uniform vec4 albedo : source_color;
-uniform sampler2D texture_albedo : source_color, filter_linear_mipmap, repeat_enable;
-uniform ivec2 albedo_texture_size;
-uniform float point_size : hint_range(0.1, 128.0, 0.1);
-
-uniform float roughness : hint_range(0.0, 1.0);
-uniform sampler2D texture_metallic : hint_default_white, filter_linear_mipmap, repeat_enable;
-uniform vec4 metallic_texture_channel;
-uniform sampler2D texture_roughness : hint_roughness_r, filter_linear_mipmap, repeat_enable;
-
-uniform float specular : hint_range(0.0, 1.0, 0.01);
-uniform float metallic : hint_range(0.0, 1.0, 0.01);
-
-uniform vec3 uv1_scale;
-uniform vec3 uv1_offset;
-uniform vec3 uv2_scale;
-uniform vec3 uv2_offset;
-
-void vertex() {
-	UV = UV * uv1_scale.xy + uv1_offset.xy;
-}
-
-void fragment() {
-	vec4 v_pos = inverse(MODEL_MATRIX) * INV_VIEW_MATRIX * vec4(VERTEX, 1.0);
-	if(v_pos.z <= -0.4999) discard; //@TODO: This might have issues
-	vec2 base_uv = UV;
-
-	vec4 albedo_tex = texture(texture_albedo, base_uv);
-	ALBEDO = albedo.rgb * albedo_tex.rgb;
-
-	float metallic_tex = dot(texture(texture_metallic, base_uv), metallic_texture_channel);
-	METALLIC = metallic_tex * metallic;
-	SPECULAR = specular;
-
-	vec4 roughness_texture_channel = vec4(1.0, 0.0, 0.0, 0.0);
-	float roughness_tex = dot(texture(texture_roughness, base_uv), roughness_texture_channel);
-	ROUGHNESS = roughness_tex * roughness;
-}
-"
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_1bnk6"]
-render_priority = 0
-shader = SubResource("Shader_t3yvt")
-shader_parameter/albedo = Color(0.3350966, 0.0007117576, 0.885835, 1)
-shader_parameter/albedo_texture_size = Vector2i(0, 0)
-shader_parameter/point_size = 1.0
-shader_parameter/roughness = 1.0
-shader_parameter/metallic_texture_channel = Vector4(1, 0, 0, 0)
-shader_parameter/specular = 0.0
-shader_parameter/metallic = 0.0
-shader_parameter/uv1_scale = Vector3(1, 1, 1)
-shader_parameter/uv1_offset = Vector3(0, 0, 0)
-shader_parameter/uv2_scale = Vector3(1, 1, 1)
-shader_parameter/uv2_offset = Vector3(0, 0, 0)
 
 [node name="Note" type="Node3D" unique_id=34288547]
 script = ExtResource("1_t3yvt")
@@ -75,7 +14,7 @@ script = ExtResource("1_t3yvt")
 [node name="Mesh" type="MeshInstance3D" parent="Main" unique_id=848404269]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5)
 mesh = SubResource("BoxMesh_7buut")
-surface_material_override/0 = SubResource("StandardMaterial3D_7buut")
+surface_material_override/0 = ExtResource("2_43c4j")
 
 [node name="Hold" type="Node3D" parent="." unique_id=1999303074]
 visible = false
@@ -83,4 +22,4 @@ visible = false
 [node name="Mesh" type="MeshInstance3D" parent="Hold" unique_id=495099018]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5)
 mesh = SubResource("BoxMesh_7buut")
-surface_material_override/0 = SubResource("ShaderMaterial_1bnk6")
+surface_material_override/0 = ExtResource("3_njo4t")

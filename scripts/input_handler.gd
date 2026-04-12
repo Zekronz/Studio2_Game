@@ -1,5 +1,8 @@
 extends Node
 
+const MAX_SUPPORTED_KEY_COUNT : int = 7
+var key_count : int = 4
+
 const KEY_CODES : Array = [
 	[KEY_SPACE],
 	[KEY_D, KEY_K],
@@ -10,16 +13,26 @@ const KEY_CODES : Array = [
 	[KEY_A, KEY_S, KEY_D, KEY_SPACE, KEY_K, KEY_L, KEY_QUOTELEFT],
 ]
 
-@onready var playfield : Node3D = $"../Playfield";
+var key_down : int = 0
+var key_pressed : int = 0
 
 func _process(delta: float) -> void:
-	assert(len(KEY_CODES) >= playfield.key_count)
+	key_pressed = 0
 	
-	var key_press : int = 0
-	var key_ind : int = 0
-	for key in KEY_CODES[playfield.key_count - 1]:
-		if Input.is_key_pressed(key):
-			key_press |= (1 << key_ind)
-		key_ind += 1
+	for i in range(key_count):
+		var key_code = KEY_CODES[key_count - 1][i]
 		
-	playfield.set_key_press(key_press)
+		if Input.is_key_pressed(key_code) and not (key_down & (1 << i)):
+			key_down |= (1 << i)
+			key_pressed |= (1 << i)
+			
+		elif not Input.is_key_pressed(key_code) and (key_down & (1 << i)):
+			key_down &= ~(1 << i);
+	
+func is_column_down(column_ind : int) -> bool:
+	assert(column_ind >= 0 && column_ind < MAX_SUPPORTED_KEY_COUNT)
+	return (key_down & (1 << column_ind))
+
+func is_column_pressed(column_ind : int) -> bool:
+	assert(column_ind >= 0 && column_ind < MAX_SUPPORTED_KEY_COUNT)
+	return (key_pressed & (1 << column_ind))

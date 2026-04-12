@@ -1,14 +1,13 @@
 extends Node3D
 
-var key_count : int = 4
-
-const FIELD_LENGTH : float = 50
+const FIELD_LENGTH : float = 30
 const FIELD_SPAWN_POS : float = FIELD_LENGTH + 10.0
-const FIELD_DESPAWN_POS : float = -10.0
+const FIELD_DESPAWN_POS : float = -5.0
 var field_width : float = 0
 
 const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
+var num_columns : int = InputHandler.key_count
 
 const RECEPTOR_OFFSET : float = 0.5
 
@@ -22,29 +21,36 @@ var floor_mat : ShaderMaterial;
 func _ready() -> void:
 	floor_mat = floor_mesh.get_active_material(0)
 	floor_mat.set_shader_parameter("receptor_offset", RECEPTOR_OFFSET)
-	floor_mat.set_shader_parameter("key_count", key_count)
+	floor_mat.set_shader_parameter("key_count", num_columns)
 	
 	update_playfield_transform()
 	
-func set_key_count(count : int) -> void:
-	assert(count > 0)
-	if key_count == count:
-		return
+func _process(delta : float) -> void:
+	var key_press : int = 0
+	
+	for key_ind in range(InputHandler.key_count):
+		if InputHandler.is_column_down(key_ind):
+			key_press |= (1 << key_ind)
 		
-	key_count = count
-	floor_mat.set_shader_parameter("key_count", key_count)
-	update_playfield_transform()
-	
-func set_key_press(key_press : int) -> void:
 	floor_mat.set_shader_parameter("key_press", key_press)
 	
+func set_num_columns(count : int) -> void:
+	assert(count > 0)
+	if num_columns == count:
+		return
+		
+	num_columns = count
+		
+	floor_mat.set_shader_parameter("key_count", num_columns)
+	update_playfield_transform()
+	
 func get_column_center(column : int) -> float:
-	assert(column >= 0 && column < key_count)
+	assert(column >= 0 && column < num_columns)
 	return column_start + (float(column) * COLUMN_WIDTH)
 
 func update_playfield_transform() -> void:
-	field_width = COLUMN_WIDTH * key_count
-	column_start = -(float(key_count) / 2.0 * COLUMN_WIDTH) + ((COLUMN_WIDTH / 2.0) * float(key_count % 1 == 0))
+	field_width = COLUMN_WIDTH * num_columns
+	column_start = -(float(num_columns) / 2.0 * COLUMN_WIDTH) + ((COLUMN_WIDTH / 2.0) * float(num_columns % 1 == 0))
 	
 	floor_mesh.scale = Vector3(field_width, 1, FIELD_LENGTH)
 	

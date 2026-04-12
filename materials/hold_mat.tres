@@ -1,0 +1,10 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://xlk2jnr2p1tq"]
+
+[ext_resource type="Shader" uid="uid://du15cfr00fc1w" path="res://shaders/hold_shader.gdshader" id="1_eqh7x"]
+
+[resource]
+render_priority = 0
+shader = ExtResource("1_eqh7x")
+shader_parameter/albedo = Color(0.3350966, 0.0007117576, 0.885835, 1)
+shader_parameter/missed = false
+shader_parameter/pressed = false

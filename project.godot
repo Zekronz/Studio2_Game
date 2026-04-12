@@ -19,6 +19,8 @@ config/icon="res://icon.svg"
 
 MapParser="*uid://co5ntcu6i4a42"
 Judge="*uid://bbquvwmftpfud"
+InputHandler="*uid://ca61kmcxqe66q"
+NoteInfo="*uid://cprsotaj8ruew"
 
 [physics]
 
