@@ -1,5 +1,5 @@
 shader_type spatial;
-render_mode blend_mix, depth_draw_always, cull_back, diffuse_burley;
+render_mode blend_mix, depth_draw_always, cull_back, unshaded;
 
 uniform vec4 albedo : source_color;
 

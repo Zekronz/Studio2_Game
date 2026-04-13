@@ -6,6 +6,9 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 	var file = FileAccess.open(filename, FileAccess.READ)
 	assert(file != null)
 	
+	var total_single : int = 0
+	var total_hold : int = 0
+	var last_timing : float = 0.0
 	var column_count : int = 0
 	var timing_points : Array[Dictionary]
 	var hit_objects = []
@@ -74,6 +77,9 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 			
 			assert(params[2].is_valid_int())
 			var start_time = float(params[2].to_int()) / 1000.0
+			if start_time > last_timing:
+				last_timing = start_time
+			
 			var time_length = -1.0
 			
 			assert(params[3].is_valid_int())
@@ -88,6 +94,13 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 				
 				time_length = (float(temp[0].to_int()) / 1000.0) - start_time
 				assert(time_length > 0.0)
+				
+				if start_time + time_length > last_timing:
+					last_timing = start_time + time_length
+				
+				total_hold += 1
+			else:
+				total_single += 1
 			
 			hit_objects[col].append({ "column": col, "start_time": start_time, "time_length": time_length, "is_hold": is_hold })
 	
@@ -96,5 +109,8 @@ func load_map(filename : String, convert_hold_to_single : bool = false) -> Dicti
 	return {
 		"key_count": column_count,
 		"timing_points": timing_points,
+		"total_single": total_single,
+		"total_hold": total_hold,
+		"last_timing": last_timing,
 		"hit_objects": hit_objects
 	}

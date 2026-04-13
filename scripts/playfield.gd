@@ -53,10 +53,10 @@ func update_playfield_transform() -> void:
 	column_start = -(float(num_columns) / 2.0 * COLUMN_WIDTH) + ((COLUMN_WIDTH / 2.0) * float(num_columns % 1 == 0))
 	
 	floor_mesh.scale = Vector3(field_width, 1, FIELD_LENGTH - FIELD_DESPAWN_POS)
-	floor_mesh.position = FIELD_DESPAWN_POS * Vector3.BACK;
+	floor_mesh.position = Vector3(0.0, 0, FIELD_DESPAWN_POS);
 	
 	receptor_mesh.scale = Vector3(field_width, receptor_mesh.scale.y, receptor_mesh.scale.z)
-	receptor_mesh.position = Vector3(0.0, -0.09, RECEPTOR_OFFSET)
+	receptor_mesh.position = Vector3(0.0, 0.01, RECEPTOR_OFFSET)
 	
 	left_mesh.scale = Vector3(left_mesh.scale.x, left_mesh.scale.y, FIELD_LENGTH)
 	left_mesh.position = Vector3((field_width / 2) + (left_mesh.scale.x / 2), left_mesh.position.y, (FIELD_LENGTH / 2))

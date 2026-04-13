@@ -17,7 +17,11 @@ var map_loaded : bool = false
 var note_scene : Resource = preload("res://scenes/note.tscn")
 var hit_objects : Array;
 var column_pressed : int = 0
+var total_single : int = 0
+var total_hold : int = 0
+var song_length : float = 0
 var total_hits : int = 0
+var score : int = 0
 var hit_score : int = 0
 var accuracy : float = 0
 var hit_deviation : float = 0
@@ -30,6 +34,8 @@ func _ready() -> void:
 func _process(delta : float) -> void:
 	if not map_loaded:
 		return
+		
+	update_progress()
 		
 	check_note_spawns()
 	
@@ -87,11 +93,21 @@ func load_map():
 	
 	hit_objects = map["hit_objects"]
 	
+	total_single = map["total_single"]
+	total_hold = map["total_hold"]
+	song_length = map["last_timing"] + (2 * audio_handler.pitch_scale)
 	total_hits = 0
 	hit_score = 0
+	score = 0
 	accuracy = 0
 	hit_deviation = 0
 	combo = 0
+	
+	ui.set_score(0)
+	ui.set_accuracy(0)
+	ui.set_hit_average(0)
+	ui.set_combo(0)
+	update_progress()
 	
 	check_note_spawns()
 	map_loaded = true
@@ -103,8 +119,8 @@ func check_note_spawns() -> void:
 		while len(col_list) > 0:
 			var obj = col_list[0]
 			
-			var start_delta = obj["start_time"] - audio_handler.get_playback_position()
-			var end_delta = (obj["start_time"] + obj["time_length"]) - audio_handler.get_playback_position()
+			var start_delta = obj["start_time"] - audio_handler.get_pos()
+			var end_delta = (obj["start_time"] + obj["time_length"]) - audio_handler.get_pos()
 			
 			var note_pos = get_note_pos(obj["start_time"])
 			
@@ -139,7 +155,7 @@ func check_note_spawns() -> void:
 	ui.set_spawned_notes(num_notes)
 
 func get_note_pos(time : float) -> float:
-	return (time - audio_handler.get_playback_position() - VISUAL_OFFSET) * (SCROLL_SPEED / audio_handler.pitch_scale) + playfield.RECEPTOR_OFFSET
+	return (time - audio_handler.get_pos() - VISUAL_OFFSET) * (SCROLL_SPEED / audio_handler.pitch_scale) + playfield.RECEPTOR_OFFSET
 
 func get_note_end_point(start_time : float, time_length : float = -1) -> float:
 	if time_length <= 0.0:
@@ -174,7 +190,7 @@ func handle_note_miss_start(note) -> void:
 	assert(note.active)
 	assert(not note.missed_start)
 	
-	var start_delta = note.time - audio_handler.get_playback_position()
+	var start_delta = note.time - audio_handler.get_pos()
 	
 	var miss_start = Judge.time_behind(start_delta, Judge.BAD, audio_handler.pitch_scale)
 	if miss_start and note.is_hold and note.pressed:
@@ -190,7 +206,7 @@ func handle_note_miss_end(note) -> void:
 	assert(note.is_hold)
 	assert(not note.missed_end)
 	
-	var end_delta = (note.time + note.length) - audio_handler.get_playback_position()
+	var end_delta = (note.time + note.length) - audio_handler.get_pos()
 	var miss_end = Judge.time_behind(end_delta, Judge.BAD, audio_handler.pitch_scale)
 	
 	if miss_end:
@@ -203,7 +219,7 @@ func handle_note_judgement_start(note) -> void:
 	assert(not note.missed_start)
 	assert(not note.pressed)
 	
-	var start_delta = note.time - audio_handler.get_playback_position()
+	var start_delta = note.time - audio_handler.get_pos()
 
 	if InputHandler.is_column_pressed(note.column) and Judge.time_to_judgement(abs(start_delta), audio_handler.pitch_scale) != Judge.MISS:
 		column_pressed |= (1 << note.column)
@@ -228,7 +244,7 @@ func handle_note_judgement_end(note) -> void:
 		column_pressed |= (1 << note.column)
 		note.set_holding(false)
 		
-		var end_delta = (note.time + note.length) - audio_handler.get_playback_position()
+		var end_delta = (note.time + note.length) - audio_handler.get_pos()
 		var judge = Judge.time_to_judgement(abs(end_delta), audio_handler.pitch_scale)
 		
 		if judge == Judge.MISS:
@@ -251,6 +267,9 @@ func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
 	accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
 	ui.set_accuracy(accuracy)
 	
+	score = int(round((float(hit_score) / float((total_single + (total_hold * 2)) * Judge.SCORE[Judge.PERFECT])) * 1000000.0))
+	ui.set_score(score)
+	
 	hit_deviation += time_delta;
 	ui.set_hit_average(-(hit_deviation / float(total_hits)))
 	
@@ -263,3 +282,9 @@ func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
 	
 	if show_judge_ui:
 		ui.set_judge(judge)
+
+func update_progress():
+	if audio_handler.is_finished:
+		ui.set_progress(1.0)
+	else:
+		ui.set_progress(audio_handler.get_pos() / song_length)
