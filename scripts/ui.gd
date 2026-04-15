@@ -11,7 +11,7 @@ var spawned_notes : int = 0
 var hit_average : float = 0.0
 
 const JUDGE_TIME : float = 0.25
-var judge_timer : float = 0.0
+var judge_timer : Array[float]
 
 const JUDGE_TEXT : Dictionary = {
 	Judge.PERFECT: "PERFECT",
@@ -31,20 +31,28 @@ const JUDGE_COLOR : Dictionary = {
 	Judge.MISS: Color(1.0, 0.0, 0.0)
 }
 
+func _ready() -> void:
+	judge_timer.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
+	
+	#for i in InputHandler.MAX_SUPPORTED_KEY_COUNT - 1:
+	#	print(i)
 
 func _process(delta: float) -> void:
 	fps_label.text = "FPS: " + str(int(Engine.get_frames_per_second())) + "\nSpawned notes: " + str(spawned_notes) + "\nHit Average: " + str(hit_average * 1000.0).pad_decimals(2) + "ms"
 	
-	if judge_timer > 0:
-		judge_timer -= delta
-		if judge_timer <= 0.0:
-			judge_label.visible = false
+	for i in InputHandler.key_count:
+		if judge_timer[i] > 0:
+			judge_timer[i] -= delta
+			if judge_timer[i] <= 0.0:
+				pass
+				#judge_label.visible = false
 
 func set_judge(judge) -> void:
-	judge_timer = JUDGE_TIME
-	judge_label.text = JUDGE_TEXT[judge]
+	#judge_timer = JUDGE_TIME
+	#judge_label.text = JUDGE_TEXT[judge]
 	#judge_label.set("theme_override_colors/font_color", JUDGE_COLOR[judge])
-	judge_label.visible = true
+	#judge_label.visible = true
+	pass
 	
 func set_score(score : int) -> void:
 	score_label.text = format_int_commas(score)

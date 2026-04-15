@@ -6,6 +6,7 @@
 render_priority = 1
 shader = ExtResource("1_4srll")
 shader_parameter/albedo = Color(0, 0, 0, 0.43137255)
+shader_parameter/highlight = Color(0.48, 0.1872, 0.22623996, 1)
 shader_parameter/receptor_offset = 0.0
 shader_parameter/key_count = 0.0
 shader_parameter/key_press = 0

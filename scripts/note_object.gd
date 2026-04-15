@@ -34,6 +34,10 @@ func init(column_ind : int, n_time : float, n_length : float, n_is_hold : bool, 
 
 func set_pressed():
 	pressed = true
+	
+	if is_hold:
+		main.visible = false
+		hold_mesh.set_instance_shader_parameter("pressed", true)
 
 func set_holding(n_holding : bool):
 	assert(is_hold)

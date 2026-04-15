@@ -4,6 +4,16 @@ extends Node
 #TODO: 1 mill score? Or higher for more satisfaction?
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
+#TODO: Health
+
+#V2:
+#Key press highlight 	[X]
+#Note highlight			[X]
+#Hold cutoff			[X]
+#Per column judgement	[ ]
+#Coloured judgement		[ ]
+#Column separator		[ ]
+#Hit sounds				[ ]
 
 const SCROLL_SPEED : float = 18.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
@@ -42,7 +52,7 @@ func _process(delta : float) -> void:
 	#Update note positions and handle judgements.
 	column_pressed = 0
 	
-	for column_ind in range(playfield.num_columns):
+	for column_ind in playfield.num_columns:
 		var column = note_group.get_child(column_ind)
 		
 		for note in column.get_children():
@@ -85,10 +95,10 @@ func load_map():
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
 		
-	for column_ind in range(playfield.num_columns):
+	for column_ind in playfield.num_columns:
 		var column = Node3D.new()
 		column.name = str(column_ind)
-		column.position = playfield.get_column_center(column_ind) * Vector3.LEFT
+		column.position = playfield.get_column_center(column_ind) * Vector3.RIGHT
 		note_group.add_child(column)
 	
 	hit_objects = map["hit_objects"]
@@ -107,13 +117,14 @@ func load_map():
 	ui.set_accuracy(0)
 	ui.set_hit_average(0)
 	ui.set_combo(0)
+	#TODO: Reset judge
 	update_progress()
 	
 	check_note_spawns()
 	map_loaded = true
 
 func check_note_spawns() -> void:
-	for column_ind in range(playfield.num_columns):
+	for column_ind in playfield.num_columns:
 		var col_list = hit_objects[column_ind]
 		
 		while len(col_list) > 0:

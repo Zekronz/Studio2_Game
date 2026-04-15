@@ -19,7 +19,7 @@ var key_pressed : int = 0
 func _process(delta: float) -> void:
 	key_pressed = 0
 	
-	for i in range(key_count):
+	for i in key_count:
 		var key_code = KEY_CODES[key_count - 1][i]
 		
 		if Input.is_key_pressed(key_code) and not (key_down & (1 << i)):
