@@ -14,6 +14,8 @@ var hit_average : float = 0.0
 const JUDGE_TIME : float = 0.3
 var judge_info : Array[Dictionary]
 
+var combo_str : String
+
 var JUDGE_TEXT : Dictionary = {
 	Judge.PERFECT: "MAX",
 	Judge.GREAT: "GREAT",
@@ -49,7 +51,7 @@ func _process(delta: float) -> void:
 				
 func _draw() -> void:
 	var judge_font = ThemeDB.fallback_font
-	var judge_size = 24.0
+	var judge_size = 30.0
 	var judge_offset = 56.0
 	
 	for i in InputHandler.key_count:
@@ -61,7 +63,15 @@ func _draw() -> void:
 		var p = playfield.get_column_2d_point(i) + Vector2(-round(s.x / 2), -s.y + judge_font.get_ascent(judge_size) + judge_offset)
 		
 		draw_string(judge_font, p, JUDGE_TEXT[judge], HORIZONTAL_ALIGNMENT_CENTER, -1, judge_size, JUDGE_COLOR[judge])
-
+		
+	var combo_font = ThemeDB.fallback_font
+	var combo_size = 35.0
+	var combo_offset = 350.0
+		
+	if combo_str.length() > 0:
+		var s = combo_font.get_string_size(combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
+		var p = Vector2(round(size.x / 2.0 - s.x / 2.0), playfield.get_column_2d_point(0).y - combo_offset)
+		draw_string(combo_font, p, combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
 
 func set_judge(column, judge) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
@@ -82,10 +92,9 @@ func set_hit_average(average : float) -> void:
 
 func set_combo(combo : int) -> void:
 	if combo == 0:
-		combo_label.visible = false
+		combo_str = ""
 	else:
-		combo_label.text = str(combo)
-		combo_label.visible = true
+		combo_str = str(combo)
 
 func set_progress(progress : float) -> void:
 	progress_bar.scale = Vector2(clamp(progress, 0.0, 1.0), 1.0);

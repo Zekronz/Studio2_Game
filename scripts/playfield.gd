@@ -3,7 +3,7 @@ extends Node3D
 const FIELD_LENGTH : float = 30
 const FIELD_SPAWN_POS : float = FIELD_LENGTH + 10.0
 const FIELD_DESPAWN_POS : float = -5.0
-const FIELD_EDGE : float = 2.0
+const FIELD_EDGE : float = 0.02
 var field_width : float = 0
 
 const COLUMN_WIDTH : float = 0.7
@@ -49,7 +49,6 @@ func set_num_columns(count : int) -> void:
 		
 	floor_mat.set_shader_parameter("key_count", num_columns)
 	update_playfield_transform()
-	floor_mat.set_shader_parameter("field_width", field_width)
 	
 func get_column_center(column : int) -> float:
 	assert(column >= 0 && column < num_columns)
@@ -62,6 +61,8 @@ func get_column_2d_point(column : int) -> Vector2:
 
 func update_playfield_transform() -> void:
 	field_width = (COLUMN_WIDTH * num_columns) + (FIELD_EDGE * 2)
+	floor_mat.set_shader_parameter("field_width", field_width)
+	
 	column_start = -(float(num_columns) / 2.0 * COLUMN_WIDTH) + ((COLUMN_WIDTH / 2.0) * float(num_columns % 1 == 0))
 	
 	floor_mesh.scale = Vector3(field_width, 1, FIELD_LENGTH - FIELD_DESPAWN_POS)

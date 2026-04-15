@@ -12,11 +12,13 @@ extends Node
 #Hold cutoff			[X]
 #Per column judgement	[X]
 #Coloured judgement		[X]
-#Column separator		[ ]
-#Bar lines				[ ]
-#Hit sounds				[ ]
+#Column separator		[X]
+#Hit sounds				[X]
 
-const SCROLL_SPEED : float = 18.0
+#V3
+#Bar lines				[ ]
+
+const SCROLL_SPEED : float = 20.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -45,6 +47,10 @@ func _ready() -> void:
 func _process(delta : float) -> void:
 	if not map_loaded:
 		return
+		
+	for i in InputHandler.key_count:
+		if InputHandler.is_column_pressed(i):
+			audio_handler.oneshot(audio_handler.hit_sound)
 		
 	update_progress()
 		
@@ -89,9 +95,10 @@ func load_map():
 	for column in note_group.get_children():
 		column.queue_free()
 	
-	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu", true)
+	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])

@@ -16,7 +16,7 @@ void fragment() {
 		if(v_pos.z < receptor_offset) discard;
 	}
 
-	ALBEDO = (albedo.rgb + (0.07 * float(holding) * float(!missed))) * (1.0 - (0.6 * float(missed)));
+	ALBEDO = (albedo.rgb + (0.125 * float(holding) * float(!missed))) * (1.0 - (0.6 * float(missed)));
 	
 	METALLIC = 0.0;
 	SPECULAR = 0.0;
