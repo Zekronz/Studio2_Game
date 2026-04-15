@@ -10,9 +10,10 @@ extends Node
 #Key press highlight 	[X]
 #Note highlight			[X]
 #Hold cutoff			[X]
-#Per column judgement	[ ]
-#Coloured judgement		[ ]
+#Per column judgement	[X]
+#Coloured judgement		[X]
 #Column separator		[ ]
+#Bar lines				[ ]
 #Hit sounds				[ ]
 
 const SCROLL_SPEED : float = 18.0
@@ -151,10 +152,10 @@ func check_note_spawns() -> void:
 					miss_end = true
 					
 			if miss_start:
-				add_hit(Judge.MISS, start_delta, false)
+				add_hit(column_ind, Judge.MISS, start_delta, false)
 				
 			if miss_end:
-				add_hit(Judge.MISS, end_delta, false)
+				add_hit(column_ind, Judge.MISS, end_delta, false)
 			
 			if not miss_start or (not miss_end and is_hold):
 				spawn_note_at(obj["column"], obj["start_time"], obj["time_length"])
@@ -210,7 +211,7 @@ func handle_note_miss_start(note) -> void:
 	if miss_start:
 		note.set_pressed()
 		note.set_missed_start()
-		add_hit(Judge.MISS, start_delta)
+		add_hit(note.column, Judge.MISS, start_delta)
 		
 func handle_note_miss_end(note) -> void:
 	assert(note.active)
@@ -223,7 +224,7 @@ func handle_note_miss_end(note) -> void:
 	if miss_end:
 		note.set_holding(false)
 		note.set_missed_end()
-		add_hit(Judge.MISS, end_delta)
+		add_hit(note.column, Judge.MISS, end_delta)
 
 func handle_note_judgement_start(note) -> void:
 	assert(note.active)
@@ -241,7 +242,7 @@ func handle_note_judgement_start(note) -> void:
 		else:
 			note.set_holding(true)
 		
-		note_hit(start_delta)
+		note_hit(note.column, start_delta)
 
 func handle_note_judgement_end(note) -> void:
 	assert(note.active)
@@ -263,14 +264,16 @@ func handle_note_judgement_end(note) -> void:
 		else:
 			destroy_note(note)
 		
-		add_hit(judge, end_delta)
+		add_hit(note.column, judge, end_delta)
 
-func note_hit(time_delta : float) -> void:
+func note_hit(column : int, time_delta : float) -> void:
+	assert(column >= 0 && column < InputHandler.key_count)
 	var judge = Judge.time_to_judgement(abs(time_delta), audio_handler.pitch_scale)
 	assert(judge != Judge.MISS)
-	add_hit(judge, time_delta)
+	add_hit(column, judge, time_delta)
 	
-func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
+func add_hit(column, judge, time_delta, show_judge_ui : bool = true) -> void:
+	assert(column >= 0 && column < InputHandler.key_count)
 	time_delta /= audio_handler.pitch_scale
 	total_hits += 1
 	
@@ -292,7 +295,7 @@ func add_hit(judge, time_delta, show_judge_ui : bool = true) -> void:
 	ui.set_combo(combo)
 	
 	if show_judge_ui:
-		ui.set_judge(judge)
+		ui.set_judge(column, judge)
 
 func update_progress():
 	if audio_handler.is_finished:

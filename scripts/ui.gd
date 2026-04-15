@@ -1,7 +1,8 @@
 extends Control
 
+@onready var playfield = $"../Playfield"
+
 @onready var fps_label = $FPSLabel
-@onready var judge_label = $JudgementLabel
 @onready var combo_label = $ComboLabel
 @onready var score_label = $ScoreLabel
 @onready var acc_label = $AccLabel
@@ -10,11 +11,11 @@ extends Control
 var spawned_notes : int = 0
 var hit_average : float = 0.0
 
-const JUDGE_TIME : float = 0.25
-var judge_timer : Array[float]
+const JUDGE_TIME : float = 0.3
+var judge_info : Array[Dictionary]
 
-const JUDGE_TEXT : Dictionary = {
-	Judge.PERFECT: "PERFECT",
+var JUDGE_TEXT : Dictionary = {
+	Judge.PERFECT: "MAX",
 	Judge.GREAT: "GREAT",
 	Judge.GOOD: "GOOD",
 	Judge.OK: "OK",
@@ -22,7 +23,7 @@ const JUDGE_TEXT : Dictionary = {
 	Judge.MISS: "MISS",
 }
 
-const JUDGE_COLOR : Dictionary = {
+var JUDGE_COLOR : Dictionary = {
 	Judge.PERFECT: Color(0.995, 0.719, 0.0, 1.0),
 	Judge.GREAT: Color(0.767, 0.925, 0.0, 1.0),
 	Judge.GOOD: Color(0.0, 0.722, 0.633, 1.0),
@@ -32,27 +33,40 @@ const JUDGE_COLOR : Dictionary = {
 }
 
 func _ready() -> void:
-	judge_timer.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
-	
-	#for i in InputHandler.MAX_SUPPORTED_KEY_COUNT - 1:
-	#	print(i)
+	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
+		judge_info.append({ "timer": 0.0, "judge": Judge.MISS })
 
-func _process(delta: float) -> void:
+func _process(delta: float) -> void:	
 	fps_label.text = "FPS: " + str(int(Engine.get_frames_per_second())) + "\nSpawned notes: " + str(spawned_notes) + "\nHit Average: " + str(hit_average * 1000.0).pad_decimals(2) + "ms"
 	
 	for i in InputHandler.key_count:
-		if judge_timer[i] > 0:
-			judge_timer[i] -= delta
-			if judge_timer[i] <= 0.0:
+		if judge_info[i]["timer"] > 0:
+			judge_info[i]["timer"] -= delta
+			if judge_info[i]["timer"] <= 0.0:
 				pass
-				#judge_label.visible = false
+				
+	queue_redraw()
+				
+func _draw() -> void:
+	var judge_font = ThemeDB.fallback_font
+	var judge_size = 24.0
+	var judge_offset = 56.0
+	
+	for i in InputHandler.key_count:
+		if judge_info[i]["timer"] <= 0.0:
+			continue
+			
+		var judge = judge_info[i]["judge"]
+		var s = judge_font.get_string_size(JUDGE_TEXT[judge], HORIZONTAL_ALIGNMENT_CENTER, -1, judge_size)
+		var p = playfield.get_column_2d_point(i) + Vector2(-round(s.x / 2), -s.y + judge_font.get_ascent(judge_size) + judge_offset)
+		
+		draw_string(judge_font, p, JUDGE_TEXT[judge], HORIZONTAL_ALIGNMENT_CENTER, -1, judge_size, JUDGE_COLOR[judge])
 
-func set_judge(judge) -> void:
-	#judge_timer = JUDGE_TIME
-	#judge_label.text = JUDGE_TEXT[judge]
-	#judge_label.set("theme_override_colors/font_color", JUDGE_COLOR[judge])
-	#judge_label.visible = true
-	pass
+
+func set_judge(column, judge) -> void:
+	assert(column >= 0 && column < InputHandler.key_count)
+	judge_info[column]["timer"] = JUDGE_TIME;
+	judge_info[column]["judge"] = judge;
 	
 func set_score(score : int) -> void:
 	score_label.text = format_int_commas(score)

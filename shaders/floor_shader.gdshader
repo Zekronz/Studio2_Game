@@ -4,6 +4,8 @@ render_mode blend_mix, depth_draw_always, cull_back, unshaded;
 uniform vec4 albedo : source_color;
 uniform vec3 highlight : source_color;
 
+uniform float field_width;
+uniform float field_edge;
 uniform float receptor_offset;
 uniform float key_count;
 uniform uint key_press;
@@ -15,11 +17,18 @@ void fragment() {
 	float receptor_fade = 4.0;
 	
 	if(v_pos.z >= receptor_offset && v_pos.z <= receptor_offset + receptor_fade){
-		uint column = uint(floor((1.0 - UV.x) * key_count));
+		float fe = field_edge / field_width;
+		float fw = 1.0 - fe * 2.0;
+		float fx = (UV.x - fe) / (fw - fe);
+		
+		uint column = uint(floor((1.0 - fx) * key_count));
+		if(column < uint(key_count)){
 		float pressed = float((key_press & (1u << column)) != 0u);
 		
 		float fade = 1.0 - (v_pos.z - receptor_offset) / receptor_fade;
-		col = albedo.rgb + (highlight * (fade * fade * pressed)) / 2.0;
+		vec3 h = (highlight * (fade * fade * pressed)) / 2.0;
+		col = albedo.rgb + 1.0;
+		}
 	}
 	
 	//@TODO: Outline should be outside of field.
