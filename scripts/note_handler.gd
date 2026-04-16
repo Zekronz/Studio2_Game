@@ -4,7 +4,6 @@ extends Node
 #TODO: 1 mill score? Or higher for more satisfaction?
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
-#TODO: Health
 
 #V2:
 #Key press highlight 	[X]
@@ -21,6 +20,7 @@ extends Node
 #Better camera persp	[ ]
 #Fade playfield			[ ]
 #Bar lines				[ ]
+#Scrolling visibility	[ ]
 #Different note colors	[ ]
 
 const SCROLL_SPEED : float = 20.0
@@ -50,7 +50,7 @@ var dead : bool = false
 var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
-var auto_mod : bool = false
+var auto_mod : bool = true
 
 func _ready() -> void:
 	assert(note_group != null)
@@ -145,7 +145,7 @@ func load_map():
 	total_hits = 0
 	hit_score = 0
 	score = 0
-	accuracy = 0
+	accuracy = 1.0
 	hit_deviation = 0
 	combo = 0
 	health = 0.75
@@ -154,7 +154,7 @@ func load_map():
 	pitch_multiplier = 1.0
 	
 	ui.set_score(0)
-	ui.set_accuracy(0)
+	ui.set_accuracy(accuracy)
 	ui.set_hit_average(0)
 	ui.set_combo(0)
 	ui.set_health(health)

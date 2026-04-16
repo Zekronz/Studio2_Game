@@ -4,5 +4,5 @@
 
 [resource]
 shader = ExtResource("1_sp3go")
-shader_parameter/top_color = Color(0.05490196, 0.047058824, 0.05490196, 1)
-shader_parameter/bottom_color = Color(0.08235294, 0.019607844, 0.03529412, 1)
+shader_parameter/top_color = Color(0.05, 0.043500002, 0.05, 1)
+shader_parameter/bottom_color = Color(0.18, 0.043200005, 0.07740001, 1)

@@ -54,7 +54,7 @@ func get_column_center(column : int) -> float:
 func get_column_2d_point(column : int) -> Vector2:
 	assert(column >= 0 && column < num_columns)
 	var p = Vector3(get_column_center(column), receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0)
-	return round(get_viewport().get_camera_3d().unproject_position(p))
+	return get_viewport().get_camera_3d().unproject_position(p)
 	
 func get_2d_direction_right() -> Vector2:
 	var p1 = get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, 0.0, 0.0))
@@ -62,7 +62,7 @@ func get_2d_direction_right() -> Vector2:
 	return p1.direction_to(p2)
 	
 func get_rightside_2d_point() -> Vector2:
-	return round(get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0)))
+	return get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0))
 
 func update_playfield_transform() -> void:
 	field_width = (COLUMN_WIDTH * num_columns) + (FIELD_EDGE * 2)
