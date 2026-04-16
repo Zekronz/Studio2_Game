@@ -3,7 +3,6 @@ extends Control
 @onready var playfield = $"../Playfield"
 
 @onready var fps_label = $FPSLabel
-@onready var combo_label = $ComboLabel
 @onready var score_label = $ScoreLabel
 @onready var acc_label = $AccLabel
 @onready var progress_bar = $ProgressBar
@@ -15,6 +14,8 @@ const JUDGE_TIME : float = 0.3
 var judge_info : Array[Dictionary]
 
 var combo_str : String
+var health_percentage : float
+var death_overlay : float
 
 var JUDGE_TEXT : Dictionary = {
 	Judge.PERFECT: "MAX",
@@ -72,11 +73,40 @@ func _draw() -> void:
 		var s = combo_font.get_string_size(combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
 		var p = Vector2(round(size.x / 2.0 - s.x / 2.0), playfield.get_column_2d_point(0).y - combo_offset)
 		draw_string(combo_font, p, combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
+		
+	var hp_offset = 20.0
+	var hp_dir = playfield.get_2d_direction_right()
+	var hp_pos = playfield.get_rightside_2d_point() + 15.0 * Vector2.RIGHT + hp_offset * hp_dir
+	var hp_width = 11.0
+	var hp_length = 280.0
+	
+	draw_polyline([
+		hp_pos,
+		hp_pos + hp_width * Vector2.RIGHT,
+		hp_pos + hp_width * Vector2.RIGHT + hp_dir * hp_length,
+		hp_pos + hp_dir * hp_length,
+		hp_pos
+	], Color.WHITE, 1.0, true)
+	
+	draw_primitive([
+		hp_pos,
+		hp_pos + hp_width * Vector2.RIGHT,
+		hp_pos + hp_width * Vector2.RIGHT + hp_dir * hp_length * health_percentage,
+		hp_pos + hp_dir * hp_length * health_percentage,
+	],
+	[ Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE ], [])
+	
+	if death_overlay > 0.0:
+		draw_rect(Rect2(0, 0, size.x, size.y), Color(1.0, 0.0, 0.0, death_overlay * 0.5))
 
 func set_judge(column, judge) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
 	judge_info[column]["timer"] = JUDGE_TIME;
 	judge_info[column]["judge"] = judge;
+	
+func reset_judge() -> void:
+	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
+		judge_info[i]["timer"] = 0.0
 	
 func set_score(score : int) -> void:
 	score_label.text = format_int_commas(score)
@@ -96,8 +126,14 @@ func set_combo(combo : int) -> void:
 	else:
 		combo_str = str(combo)
 
+func set_health(health : float) -> void:
+	health_percentage = health
+
 func set_progress(progress : float) -> void:
 	progress_bar.scale = Vector2(clamp(progress, 0.0, 1.0), 1.0);
+
+func set_death_overlay(amount : float) -> void:
+	death_overlay = amount
 
 func format_int_commas(num: int) -> String:
 	var num_str: String = str(abs(num))

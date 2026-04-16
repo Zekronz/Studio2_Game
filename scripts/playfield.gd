@@ -31,14 +31,11 @@ func _ready() -> void:
 	
 	update_playfield_transform()
 	
-func _process(delta : float) -> void:
-	var key_press : int = 0
+func _process(_delta : float) -> void:
+	pass
 	
-	for key_ind in range(InputHandler.key_count):
-		if InputHandler.is_column_down(key_ind):
-			key_press |= (1 << key_ind)
-		
-	floor_mat.set_shader_parameter("key_press", key_press)
+func set_key_presses(key_presses : int) -> void:
+	floor_mat.set_shader_parameter("key_press", key_presses)
 	
 func set_num_columns(count : int) -> void:
 	assert(count > 0)
@@ -58,6 +55,14 @@ func get_column_2d_point(column : int) -> Vector2:
 	assert(column >= 0 && column < num_columns)
 	var p = Vector3(get_column_center(column), receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0)
 	return round(get_viewport().get_camera_3d().unproject_position(p))
+	
+func get_2d_direction_right() -> Vector2:
+	var p1 = get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, 0.0, 0.0))
+	var p2 = get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, 0.0, FIELD_LENGTH))
+	return p1.direction_to(p2)
+	
+func get_rightside_2d_point() -> Vector2:
+	return round(get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0)))
 
 func update_playfield_transform() -> void:
 	field_width = (COLUMN_WIDTH * num_columns) + (FIELD_EDGE * 2)

@@ -16,7 +16,7 @@ const KEY_CODES : Array = [
 var key_down : int = 0
 var key_pressed : int = 0
 
-func _process(delta: float) -> void:
+func _process(_delta: float) -> void:
 	key_pressed = 0
 	
 	for i in key_count:

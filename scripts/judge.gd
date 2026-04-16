@@ -35,6 +35,15 @@ const SCORE : Dictionary = {
 	MISS: 0
 }
 
+const HEALTH : Dictionary = {
+	PERFECT: 0.015,
+	GREAT: 0.01,
+	GOOD: 0.005,
+	OK: 0.0,
+	BAD: -0.05,
+	MISS: -0.1
+}
+
 func time_to_judgement(delta : float, scale : float = 1.0):
 	if delta <= SEC[PERFECT] * scale:
 		return PERFECT
