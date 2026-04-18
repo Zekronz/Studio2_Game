@@ -10,13 +10,14 @@ const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
 var num_columns : int = InputHandler.key_count
 
-const RECEPTOR_OFFSET : float = 1.0
+const RECEPTOR_OFFSET : float = 0.6
 
 @onready var floor_mesh : MeshInstance3D = $Floor
 @onready var left_mesh : MeshInstance3D = $Left
 @onready var right_mesh : MeshInstance3D = $Right
 @onready var receptor_mesh : MeshInstance3D = $Receptor
 
+const NOTE_MAT = preload("res://materials/note_mat.tres")
 const HOLD_MAT = preload("res://materials/hold_mat.tres")
 
 var floor_mat : ShaderMaterial;
@@ -27,6 +28,7 @@ func _ready() -> void:
 	floor_mat.set_shader_parameter("receptor_offset", RECEPTOR_OFFSET)
 	floor_mat.set_shader_parameter("key_count", num_columns)
 	
+	NOTE_MAT.set_shader_parameter("size", Vector2(NoteInfo.HOLD_WIDTH, NoteInfo.NOTE_BASE_LENGTH))
 	HOLD_MAT.set_shader_parameter("receptor_offset", RECEPTOR_OFFSET)
 	
 	update_playfield_transform()

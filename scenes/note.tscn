@@ -4,22 +4,28 @@
 [ext_resource type="Material" uid="uid://cyc8jrvg3t1fd" path="res://materials/note_mat.tres" id="2_43c4j"]
 [ext_resource type="Material" uid="uid://xlk2jnr2p1tq" path="res://materials/hold_mat.tres" id="3_njo4t"]
 
-[sub_resource type="BoxMesh" id="BoxMesh_7buut"]
+[sub_resource type="PlaneMesh" id="PlaneMesh_43c4j"]
+size = Vector2(1, 1)
+center_offset = Vector3(0, 0.002, 0.5)
+
+[sub_resource type="PlaneMesh" id="PlaneMesh_njo4t"]
+size = Vector2(1, 1)
+center_offset = Vector3(0, 0.001, 0.5)
 
 [node name="Note" type="Node3D" unique_id=34288547]
 script = ExtResource("1_t3yvt")
 
 [node name="Main" type="Node3D" parent="." unique_id=365495584]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 0.5, 0, 0, 0)
 
-[node name="Mesh" type="MeshInstance3D" parent="Main" unique_id=848404269]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5)
-mesh = SubResource("BoxMesh_7buut")
+[node name="Mesh" type="MeshInstance3D" parent="Main" unique_id=782278753]
+mesh = SubResource("PlaneMesh_43c4j")
 surface_material_override/0 = ExtResource("2_43c4j")
 
 [node name="Hold" type="Node3D" parent="." unique_id=1999303074]
+transform = Transform3D(0.9, 0, 0, 0, 1, 0, 0, 0, 3, 0, 0, 0)
 visible = false
 
-[node name="Mesh" type="MeshInstance3D" parent="Hold" unique_id=495099018]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.5, 0.5)
-mesh = SubResource("BoxMesh_7buut")
+[node name="Mesh" type="MeshInstance3D" parent="Hold" unique_id=1574956944]
+mesh = SubResource("PlaneMesh_njo4t")
 surface_material_override/0 = ExtResource("3_njo4t")

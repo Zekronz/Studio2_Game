@@ -1,5 +1,14 @@
-[gd_resource type="StandardMaterial3D" format=3 uid="uid://cyc8jrvg3t1fd"]
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cyc8jrvg3t1fd"]
+
+[ext_resource type="Shader" uid="uid://b6llufcy4obqo" path="res://shaders/note_shader.gdshader" id="1_sxnun"]
 
 [resource]
-shading_mode = 0
-albedo_color = Color(0.05882353, 0.84313726, 1, 1)
+render_priority = 0
+shader = ExtResource("1_sxnun")
+shader_parameter/colors = PackedColorArray(0.5882353, 1, 0.9529412, 1, 0.007843138, 0.5137255, 0.83137256, 1, 0.3254902, 0.6039216, 0.8509804, 1, 1, 1, 1, 1, 0.85882354, 0.85882354, 0.85882354, 1, 0.8509804, 0.8509804, 0.8509804, 1, 1, 0.827451, 0.5882353, 1, 1, 0.6509804, 0, 1, 0.8509804, 0.64705884, 0.32156864, 1)
+shader_parameter/radius = 0.0470000022325
+shader_parameter/border_thickness = 0.02400000114
+shader_parameter/border_glow = 6.0000002375
+shader_parameter/hit_bar_color = Color(1, 1, 1, 0.40392157)
+shader_parameter/hit_bar_size = 0.094000004465
+shader_parameter/size = Vector2(0, 0)

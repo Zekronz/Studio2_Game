@@ -17,13 +17,24 @@ extends Node
 #Miss sound				[X]
 
 #V3
+#Receptor pos			[X]
 #Better camera persp	[ ]
-#Fade playfield			[ ]
+#Fade playfield			[X]
 #Bar lines				[ ]
+#Better receptor		[X]
 #Scrolling visibility	[ ]
-#Different note colors	[ ]
+#Different note colors	[X]
+#Better note graphics 	[ ]
+#Particle effects		[ ]
+#Combo effects			[ ]
+#Better ui art			[ ]
+#Better background		[ ]
+#Camera effects			[ ]
 
-const SCROLL_SPEED : float = 20.0
+#V4
+#Show keybinds at start	[ ]
+
+const SCROLL_SPEED : float = 18.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -51,6 +62,7 @@ var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
 var auto_mod : bool = true
+var no_fail_mod : bool = false
 
 func _ready() -> void:
 	assert(note_group != null)
@@ -124,9 +136,9 @@ func load_map():
 		column.queue_free()
 	
 	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
-	var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
+	#var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
+	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -353,13 +365,13 @@ func add_hit(column : int, judge, time_delta : float, show_judge_ui : bool = tru
 		if show_judge_ui:
 			ui.set_judge(column, judge)
 		
-		if judge == Judge.MISS:
+		if judge == Judge.MISS and play_miss:
 			audio_handler.oneshot(audio_handler.miss_sound)
 		
 		health = clamp(health + Judge.HEALTH[judge], 0.0, 1.0)
 		ui.set_health(health)
 		
-		if health <= 0.0:
+		if health <= 0.0 and not no_fail_mod:
 			dead = true
 
 func update_progress():

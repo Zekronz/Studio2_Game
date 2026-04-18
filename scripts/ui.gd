@@ -2,9 +2,7 @@ extends Control
 
 @onready var playfield = $"../Playfield"
 
-@onready var fps_label = $FPSLabel
-@onready var score_label = $ScoreLabel
-@onready var acc_label = $AccLabel
+@onready var debug_label = $DebugLabel
 
 var spawned_notes : int = 0
 var hit_average : float = 0.0
@@ -42,8 +40,8 @@ func _ready() -> void:
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
 		judge_info.append({ "timer": 0.0, "judge": Judge.MISS })
 
-func _process(delta: float) -> void:	
-	fps_label.text = "FPS: " + str(int(Engine.get_frames_per_second())) + "\nSpawned notes: " + str(spawned_notes) + "\nHit Average: " + str(hit_average * 1000.0).pad_decimals(2) + "ms"
+func _process(delta: float) -> void:
+	debug_label.text = "FPS: " + str(int(Engine.get_frames_per_second())) + "\nSpawned notes: " + str(spawned_notes) + "\nHit Average: " + str(hit_average * 1000.0).pad_decimals(2) + "ms"
 	
 	for i in InputHandler.key_count:
 		if judge_info[i]["timer"] > 0:
