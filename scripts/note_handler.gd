@@ -61,7 +61,7 @@ var dead : bool = false
 var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
-var auto_mod : bool = true
+var auto_mod : bool = false
 var no_fail_mod : bool = false
 
 func _ready() -> void:
@@ -72,16 +72,12 @@ func _process(delta : float) -> void:
 	if not map_loaded:
 		return
 		
-	var key_press : int = 0
-		
 	if not auto_mod and not dead:
 		for key_ind in range(InputHandler.key_count):
-			if InputHandler.is_column_down(key_ind):
-				key_press |= (1 << key_ind)
+			playfield.set_key_press(key_ind, InputHandler.is_column_down(key_ind))
+
 			if InputHandler.is_column_pressed(key_ind):
 				audio_handler.oneshot(audio_handler.hit_sound)
-				
-	playfield.set_key_presses(key_press)
 		
 	if dead and not audio_handler.stream_paused and audio_handler.pitch_scale > 0:
 		var scale = max(0, audio_handler.pitch_scale - 0.7 * delta)

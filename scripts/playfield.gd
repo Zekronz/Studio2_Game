@@ -12,6 +12,9 @@ var num_columns : int = InputHandler.key_count
 
 const RECEPTOR_OFFSET : float = 0.6
 
+var key_press : Array[bool] = []
+var key_highlight : Array[float] = []
+
 @onready var floor_mesh : MeshInstance3D = $Floor
 @onready var left_mesh : MeshInstance3D = $Left
 @onready var right_mesh : MeshInstance3D = $Right
@@ -33,11 +36,21 @@ func _ready() -> void:
 	
 	update_playfield_transform()
 	
-func _process(_delta : float) -> void:
-	pass
+	key_press.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
+	key_highlight.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
 	
-func set_key_presses(key_presses : int) -> void:
-	floor_mat.set_shader_parameter("key_press", key_presses)
+func _process(delta : float) -> void:
+	for i in InputHandler.key_count:
+		if key_press[i]:
+			key_highlight[i] = min(key_highlight[i] + delta * 80.0, 1.0)
+		else:
+			key_highlight[i] = max(key_highlight[i] - delta * 10.0, 0.0)
+			
+	floor_mat.set_shader_parameter("key_highlight", key_highlight)
+	
+func set_key_press(column : int, pressed : bool) -> void:
+	assert(column >= 0 && column < InputHandler.MAX_SUPPORTED_KEY_COUNT)
+	key_press[column] = pressed
 	
 func set_num_columns(count : int) -> void:
 	assert(count > 0)

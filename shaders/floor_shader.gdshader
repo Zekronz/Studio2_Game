@@ -16,7 +16,7 @@ uniform float receptor_offset;
 uniform float receptor_thickness;
 uniform float receptor_fade;
 uniform float key_count;
-uniform uint key_press;
+uniform float key_highlight[7];
 
 float outline(float uv_x, float pos, float thickness){
 	float px = fwidth(uv_x);
@@ -48,10 +48,9 @@ void fragment() {
 	if(v_pos.z >= receptor_offset && v_pos.z <= receptor_offset + receptor_fade){
 		if(fx >= 0.0 && fx <= 1.0){
 			uint column = uint(floor((1.0 - fx) * key_count));
-			float pressed = float((key_press & (1u << column)) != 0u);
 			
 			float fade = 1.0 - (v_pos.z - receptor_offset) / receptor_fade;
-			vec3 h = (highlight * (fade * fade * pressed)) / 2.0;
+			vec3 h = (highlight * (fade * fade * float(key_highlight[column]))) / 2.0;
 			col += h;
 		}
 	}
