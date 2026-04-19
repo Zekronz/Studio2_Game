@@ -1,6 +1,6 @@
 extends Node3D
 
-const FIELD_LENGTH : float = 30
+const FIELD_LENGTH : float = 25
 const FIELD_SPAWN_POS : float = FIELD_LENGTH + 10.0
 const FIELD_DESPAWN_POS : float = -5.0
 const FIELD_EDGE : float = 0.02

@@ -14,7 +14,8 @@ var missed_end : bool = false
 var main : Node3D
 var hold : Node3D
 
-var hold_mesh : MeshInstance3D;
+var hold_mesh : MeshInstance3D
+var hold_effect : Node3D
 
 func init(column_ind : int, n_time : float, n_length : float, n_is_hold : bool, hold_length) -> void:
 	main = $Main
@@ -37,24 +38,32 @@ func init(column_ind : int, n_time : float, n_length : float, n_is_hold : bool, 
 		hold_mesh.set_instance_shader_parameter("size", Vector2(NoteInfo.HOLD_WIDTH, hold_length))
 		hold_mesh.set_instance_shader_parameter("color_ind", color_ind)
 
-func set_pressed():
+func set_pressed() -> void:
 	pressed = true
 	
 	if is_hold:
 		main.visible = false
 		hold_mesh.set_instance_shader_parameter("pressed", 1.0)
 
-func set_holding(n_holding : bool):
+func set_holding(n_holding : bool) -> void:
 	assert(is_hold)
+	if holding == n_holding:
+		return
+		
 	holding = n_holding
 	hold_mesh.set_instance_shader_parameter("holding", float(n_holding))
+	
+	if not holding:
+		assert(hold_effect != null)
+		hold_effect.on_release()
+		hold_effect = null
 
-func set_missed_start():
+func set_missed_start() -> void:
 	missed_start = true
 	if is_hold:
 		hold_mesh.set_instance_shader_parameter("missed", 1.0)
 
-func set_missed_end():
+func set_missed_end() -> void:
 	missed_end = true
 	if is_hold:
 		hold_mesh.set_instance_shader_parameter("missed", 1.0)

@@ -1,0 +1,16 @@
+[gd_scene format=3 uid="uid://dtjqmf1y2g8rm"]
+
+[ext_resource type="Script" uid="uid://ckbkj8ymeascu" path="res://scripts/hold_effect.gd" id="1_f3q12"]
+[ext_resource type="Material" uid="uid://cp07ocgx22l81" path="res://materials/flash_mat.tres" id="2_ptc5j"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_fekrc"]
+lightmap_size_hint = Vector2i(5, 9)
+flip_faces = true
+size = Vector2(2, 2)
+
+[node name="HoldEffect" type="Node3D" unique_id=35749516]
+script = ExtResource("1_f3q12")
+
+[node name="Flash1" type="MeshInstance3D" parent="." unique_id=965629584]
+mesh = SubResource("QuadMesh_fekrc")
+surface_material_override/0 = ExtResource("2_ptc5j")

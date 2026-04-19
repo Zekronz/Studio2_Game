@@ -19,14 +19,14 @@ extends Node
 
 #V3
 #Receptor pos			[X]
-#Better camera persp	[ ]
+#Better camera persp	[X]
 #Fade playfield			[X]
 #Bar lines				[ ]
 #Better receptor		[X]
 #Scrolling visibility	[ ]
 #Different note colors	[X]
 #Better note graphics 	[ ]
-#Particle effects		[ ]
+#Particle effects		[X]
 #Combo effects			[ ]
 #Better ui art			[ ]
 #Better background		[ ]
@@ -46,6 +46,7 @@ const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 var note_scene : Resource = preload("res://scenes/note.tscn")
 var hit_fx_scene : Resource = preload("res://scenes/hit_effect.tscn")
+var hold_fx_scene : Resource = preload("res://scenes/hold_effect.tscn")
 
 var map_loaded : bool = false
 var hit_objects : Array;
@@ -65,11 +66,18 @@ var dead : bool = false
 var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
+var current_hold_notes : Array[Node3D]
+
 var auto_mod : bool = true
 var no_fail_mod : bool = false
 
 func _ready() -> void:
 	assert(note_group != null)
+	
+	current_hold_notes.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
+	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
+		current_hold_notes[i] = null
+	
 	load_map()
 
 func _process(delta : float) -> void:
@@ -134,10 +142,13 @@ func load_map():
 	
 	for column in note_group.get_children():
 		column.queue_free()
+		
+	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
+		current_hold_notes[i] = null
 	
-	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
 	#var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
-	var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
+	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
 	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
@@ -205,10 +216,10 @@ func check_note_spawns() -> void:
 					miss_end = true
 					
 			if miss_start:
-				add_hit(column_ind, Judge.MISS, start_delta, false)
+				add_hit(column_ind, is_hold, false, Judge.MISS, start_delta, false)
 				
 			if miss_end:
-				add_hit(column_ind, Judge.MISS, end_delta, false)
+				add_hit(column_ind, is_hold, true, Judge.MISS, end_delta, false)
 			
 			if not miss_start or (not miss_end and is_hold):
 				spawn_note_at(obj["column"], obj["start_time"], obj["time_length"])
@@ -249,8 +260,12 @@ func spawn_note_at(column_ind : int, start_time : float, time_length : float = -
 	note_group.get_child(column_ind).add_child(note)
 
 func destroy_note(note) -> void:
-	note.queue_free()
+	if note.hold_effect != null:
+		note.hold_effect.queue_free()
+		note.hold_effect = null
+		
 	note.active = false
+	note.queue_free()
 
 func handle_note_miss_start(note) -> void:
 	assert(note.active)
@@ -265,7 +280,7 @@ func handle_note_miss_start(note) -> void:
 	if miss_start:
 		note.set_pressed()
 		note.set_missed_start()
-		add_hit(note.column, Judge.MISS, start_delta)
+		add_hit(note.column, note.is_hold, false, Judge.MISS, start_delta)
 		
 func handle_note_miss_end(note) -> void:
 	assert(note.active)
@@ -276,9 +291,10 @@ func handle_note_miss_end(note) -> void:
 	var miss_end = Judge.time_behind(end_delta, Judge.BAD, audio_handler.start_pitch)
 	
 	if miss_end:
-		note.set_holding(false)
 		note.set_missed_end()
-		add_hit(note.column, Judge.MISS, end_delta)
+		note.set_holding(false)
+		current_hold_notes[note.column] = note
+		add_hit(note.column, true, true, Judge.MISS, end_delta)
 
 func handle_note_judgement_start(note) -> void:
 	assert(note.active)
@@ -302,8 +318,9 @@ func handle_note_judgement_start(note) -> void:
 			destroy_note(note)
 		else:
 			note.set_holding(true)
+			current_hold_notes[note.column] = note
 		
-		note_hit(note.column, start_delta)
+		note_hit(note, start_delta)
 
 func handle_note_judgement_end(note) -> void:
 	assert(note.active)
@@ -331,15 +348,16 @@ func handle_note_judgement_end(note) -> void:
 		else:
 			destroy_note(note)
 		
-		add_hit(note.column, judge, end_delta)
+		current_hold_notes[note.column] = null
+		add_hit(note.column, true, true, judge, end_delta)
 
-func note_hit(column : int, time_delta : float) -> void:
-	assert(column >= 0 && column < InputHandler.key_count)
+func note_hit(note, time_delta : float) -> void:
+	assert(note.column >= 0 && note.column < InputHandler.key_count)
 	var judge = Judge.time_to_judgement(abs(time_delta), audio_handler.start_pitch)
 	assert(judge != Judge.MISS)
-	add_hit(column, judge, time_delta)
+	add_hit(note.column, note.is_hold, false, judge, time_delta)
 	
-func add_hit(column : int, judge, time_delta : float, user_hit : bool = true) -> void:
+func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta : float, user_hit : bool = true) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
 	
 	time_delta /= audio_handler.start_pitch
@@ -370,7 +388,11 @@ func add_hit(column : int, judge, time_delta : float, user_hit : bool = true) ->
 			if judge == Judge.MISS:
 				audio_handler.oneshot(audio_handler.miss_sound)
 			else:
-				spawn_hit_effect(column)
+				spawn_hit_effect(column, false)
+				
+				if is_hold and not is_release:
+					var fx = spawn_hit_effect(column, true)
+					current_hold_notes[column].hold_effect = fx
 		
 			health = clamp(health + Judge.HEALTH[judge], 0.0, 1.0)
 			ui.set_health(health)
@@ -385,10 +407,19 @@ func update_progress():
 		var pos = paused_pos if audio_handler.stream_paused else audio_handler.get_pos()
 		ui.set_progress(pos / song_length)
 		
-func spawn_hit_effect(column : int):
+func spawn_hit_effect(column : int, hold : bool) -> Node3D:
 	assert(column >= 0 && column < InputHandler.key_count)
 	
-	var hit_fx = hit_fx_scene.instantiate()
-	hit_fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET)# - 0.0125);
-	hit_fx.rotation = Vector3(-get_viewport().get_camera_3d().rotation.x, 0.0, 0.0)
-	fx_group.add_child(hit_fx)
+	var fx = null
+	if not hold:
+		fx = hit_fx_scene.instantiate()
+	else:
+		fx = hold_fx_scene.instantiate()
+		
+	assert(fx != null)
+	
+	fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET)# - 0.0125);
+	fx.rotation = Vector3(-get_viewport().get_camera_3d().rotation.x, 0.0, 0.0)
+	fx_group.add_child(fx)
+	
+	return fx
