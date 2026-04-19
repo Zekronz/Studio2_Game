@@ -137,8 +137,8 @@ func load_map():
 	
 	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
 	#var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
-	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
+	var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
+	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -389,6 +389,6 @@ func spawn_hit_effect(column : int):
 	assert(column >= 0 && column < InputHandler.key_count)
 	
 	var hit_fx = hit_fx_scene.instantiate()
-	hit_fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET - 0.0125);
+	hit_fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET)# - 0.0125);
 	hit_fx.rotation = Vector3(-get_viewport().get_camera_3d().rotation.x, 0.0, 0.0)
 	fx_group.add_child(hit_fx)

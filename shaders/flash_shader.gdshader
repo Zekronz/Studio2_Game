@@ -6,7 +6,7 @@ instance uniform vec3 albedo = vec3(1.0);
 instance uniform float alpha = 1.0;
 instance uniform vec3 uv_scale = vec3(1.0);
 
-uniform sampler2D texture_albedo[2] : source_color, filter_linear_mipmap, repeat_disable;
+uniform sampler2D texture_albedo[4] : source_color, filter_linear_mipmap, repeat_disable;
 uniform ivec2 albedo_texture_size;
 
 //uniform vec3 uv1_offset;

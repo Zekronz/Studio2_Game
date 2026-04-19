@@ -15,7 +15,7 @@ func _ready() -> void:
 	finished.connect(on_finished)
 	volume_db = -25.0
 	start_pitch = pitch_scale
-	play(50.0)
+	play(40.0)
 
 func _process(_delta: float) -> void:
 	pass

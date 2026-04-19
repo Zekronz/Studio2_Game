@@ -22,7 +22,7 @@ center_offset = Vector3(0, 0.55, 0)
 
 [sub_resource type="QuadMesh" id="QuadMesh_huqvv"]
 lightmap_size_hint = Vector2i(5, 9)
-flip_faces = true
+orientation = 1
 
 [node name="HitEffect" type="Node3D" unique_id=35749516]
 script = ExtResource("1_o1x8x")
