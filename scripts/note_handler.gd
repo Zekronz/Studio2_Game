@@ -4,6 +4,7 @@ extends Node
 #TODO: 1 mill score? Or higher for more satisfaction?
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
+#TODO: Song info ui display?
 
 #V2:
 #Key press highlight 	[X]
@@ -34,16 +35,19 @@ extends Node
 #V4
 #Show keybinds at start	[ ]
 
-const SCROLL_SPEED : float = 18.0
+const SCROLL_SPEED : float = 20.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
 @onready var ui : Control = $UI
 @onready var playfield : Node3D = $Playfield
-@onready var note_group : Node3D = $Notes;
+@onready var note_group : Node3D = $Notes
+@onready var fx_group : Node3D = $FX
+
+var note_scene : Resource = preload("res://scenes/note.tscn")
+var hit_fx_scene : Resource = preload("res://scenes/hit_effect.tscn")
 
 var map_loaded : bool = false
-var note_scene : Resource = preload("res://scenes/note.tscn")
 var hit_objects : Array;
 var column_pressed : int = 0
 var total_single : int = 0
@@ -61,7 +65,7 @@ var dead : bool = false
 var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
-var auto_mod : bool = false
+var auto_mod : bool = true
 var no_fail_mod : bool = false
 
 func _ready() -> void:
@@ -201,10 +205,10 @@ func check_note_spawns() -> void:
 					miss_end = true
 					
 			if miss_start:
-				add_hit(column_ind, Judge.MISS, start_delta, false, false)
+				add_hit(column_ind, Judge.MISS, start_delta, false)
 				
 			if miss_end:
-				add_hit(column_ind, Judge.MISS, end_delta, false, false)
+				add_hit(column_ind, Judge.MISS, end_delta, false)
 			
 			if not miss_start or (not miss_end and is_hold):
 				spawn_note_at(obj["column"], obj["start_time"], obj["time_length"])
@@ -335,40 +339,44 @@ func note_hit(column : int, time_delta : float) -> void:
 	assert(judge != Judge.MISS)
 	add_hit(column, judge, time_delta)
 	
-func add_hit(column : int, judge, time_delta : float, show_judge_ui : bool = true, play_miss : bool = true) -> void:
+func add_hit(column : int, judge, time_delta : float, user_hit : bool = true) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
+	
 	time_delta /= audio_handler.start_pitch
-	total_hits += 1
 	
-	hit_score += Judge.SCORE[judge]
-	accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
-	ui.set_accuracy(accuracy)
+	if user_hit:
+		total_hits += 1
 	
-	score = int(round((float(hit_score) / float((total_single + (total_hold * 2)) * Judge.SCORE[Judge.PERFECT])) * 1000000.0))
-	ui.set_score(score)
+		hit_score += Judge.SCORE[judge]
+		accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
+		ui.set_accuracy(accuracy)
 	
-	hit_deviation += time_delta;
-	ui.set_hit_average(-(hit_deviation / float(total_hits)))
+		score = int(round((float(hit_score) / float((total_single + (total_hold * 2)) * Judge.SCORE[Judge.PERFECT])) * 1000000.0))
+		ui.set_score(score)
 	
-	if judge == Judge.MISS:
-		combo = 0
-	else:
-		combo += 1
-	
-	ui.set_combo(combo)
-	
-	if not dead:
-		if show_judge_ui:
-			ui.set_judge(column, judge)
+		hit_deviation += time_delta;
+		ui.set_hit_average(-(hit_deviation / float(total_hits)))
 		
-		if judge == Judge.MISS and play_miss:
-			audio_handler.oneshot(audio_handler.miss_sound)
+		if judge == Judge.MISS:
+			combo = 0
+		else:
+			combo += 1
+	
+		#ui.set_combo(combo)
+	
+		if not dead:
+			#ui.set_judge(column, judge)
 		
-		health = clamp(health + Judge.HEALTH[judge], 0.0, 1.0)
-		ui.set_health(health)
+			if judge == Judge.MISS:
+				audio_handler.oneshot(audio_handler.miss_sound)
+			else:
+				spawn_hit_effect(column)
 		
-		if health <= 0.0 and not no_fail_mod:
-			dead = true
+			health = clamp(health + Judge.HEALTH[judge], 0.0, 1.0)
+			ui.set_health(health)
+			
+			if health <= 0.0 and not no_fail_mod:
+				dead = true
 
 func update_progress():
 	if audio_handler.is_finished:
@@ -376,3 +384,11 @@ func update_progress():
 	else:
 		var pos = paused_pos if audio_handler.stream_paused else audio_handler.get_pos()
 		ui.set_progress(pos / song_length)
+		
+func spawn_hit_effect(column : int):
+	assert(column >= 0 && column < InputHandler.key_count)
+	
+	var hit_fx = hit_fx_scene.instantiate()
+	hit_fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET - 0.0125);
+	hit_fx.rotation = Vector3(-get_viewport().get_camera_3d().rotation.x, 0.0, 0.0)
+	fx_group.add_child(hit_fx)

@@ -8,5 +8,5 @@ vec3 bg_color(vec4 fg, vec2 uv){
 }
 
 float fade_out(float pos){
-	return 1.0 - smoothstep(15.0, 25.0, pos);
+	return 1.0 - smoothstep(8.0, 20.0, pos);
 }

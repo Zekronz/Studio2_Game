@@ -24,7 +24,6 @@ script = ExtResource("1_sugp2")
 
 [node name="AudioStreamPlayer" type="AudioStreamPlayer" parent="." unique_id=1564940707]
 stream = ExtResource("2_tefeu")
-pitch_scale = 0.75
 script = ExtResource("2_0wfyh")
 
 [node name="Sounds" type="Node" parent="." unique_id=1193637863]
@@ -60,13 +59,16 @@ grow_vertical = 2
 color = Color(0, 0, 0, 1)
 
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="." unique_id=1487801197]
-transform = Transform3D(0.52937156, -0.35537502, 0.77037287, 0, 0.9080408, 0.41888162, -0.84839016, -0.22174402, 0.480691, 2.3051422, 1.2533952, 1.4383438)
+transform = Transform3D(-1, 0, -8.742278e-08, 0, 1, 0, 8.742278e-08, 0, -1, 2.3051422, 1.2533952, -0.33027458)
 light_energy = 1.95
 
 [node name="Camera" type="Camera3D" parent="." unique_id=1040328166]
 transform = Transform3D(-1, 1.0955303e-14, 8.742278e-08, 5.3053625e-08, 0.7948067, 0.60686266, -6.94842e-08, 0.60686266, -0.7948067, 0, 2.5227208, -0.7481267)
+fov = 70.0
 far = 25.0
 
 [node name="Playfield" parent="." unique_id=1342724330 instance=ExtResource("4_jyhfs")]
 
 [node name="Notes" type="Node3D" parent="." unique_id=383946643]
+
+[node name="FX" type="Node3D" parent="." unique_id=599851191]

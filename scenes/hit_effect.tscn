@@ -1,0 +1,37 @@
+[gd_scene format=3 uid="uid://crlrupnyu5sox"]
+
+[ext_resource type="Script" uid="uid://k8q1m2e3wf32" path="res://scripts/hit_effect.gd" id="1_o1x8x"]
+[ext_resource type="Material" uid="uid://cp07ocgx22l81" path="res://materials/flash_mat.tres" id="1_o5cci"]
+
+[sub_resource type="QuadMesh" id="QuadMesh_fekrc"]
+lightmap_size_hint = Vector2i(5, 9)
+flip_faces = true
+size = Vector2(2, 2)
+
+[sub_resource type="QuadMesh" id="QuadMesh_i8igs"]
+lightmap_size_hint = Vector2i(5, 9)
+flip_faces = true
+size = Vector2(1, 2)
+center_offset = Vector3(-0.5, 0, 0)
+
+[sub_resource type="QuadMesh" id="QuadMesh_uskgh"]
+lightmap_size_hint = Vector2i(5, 9)
+flip_faces = true
+size = Vector2(1.1, 1.1)
+center_offset = Vector3(0, 0.55, 0)
+
+[node name="HitEffect" type="Node3D" unique_id=35749516]
+script = ExtResource("1_o1x8x")
+
+[node name="Flash1" type="MeshInstance3D" parent="." unique_id=965629584]
+mesh = SubResource("QuadMesh_fekrc")
+surface_material_override/0 = ExtResource("1_o5cci")
+
+[node name="Flash2" type="MeshInstance3D" parent="." unique_id=1308317683]
+transform = Transform3D(-4.371139e-08, 1, 0, -1, -4.371139e-08, 0, 0, 0, 1, 0, 0, 0)
+mesh = SubResource("QuadMesh_i8igs")
+surface_material_override/0 = ExtResource("1_o5cci")
+
+[node name="Flash3" type="MeshInstance3D" parent="." unique_id=1796428734]
+mesh = SubResource("QuadMesh_uskgh")
+surface_material_override/0 = ExtResource("1_o5cci")

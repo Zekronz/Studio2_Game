@@ -1,8 +1,9 @@
 extends Control
 
 @onready var playfield = $"../Playfield"
-
 @onready var debug_label = $DebugLabel
+
+var flash_tex : Texture2D = preload("res://textures/flash.png")
 
 var spawned_notes : int = 0
 var hit_average : float = 0.0
@@ -53,6 +54,26 @@ func _process(delta: float) -> void:
 				
 func _draw() -> void:
 	var ui_scale = size.y / 1080.0
+	
+	#Flash.
+	#var flash_size : Vector2 = flash_tex.get_size() * ui_scale * 1.2
+	#var flash_offset = 6.0 * ui_scale
+	#var flash_pos = playfield.get_column_2d_point(4) - flash_size / 2.0 + flash_offset * Vector2.DOWN
+	#draw_texture_rect(flash_tex, Rect2(flash_pos.x, flash_pos.y, flash_size.x, flash_size.y), false)
+	#draw_primitive([
+		#Vector2(flash_pos.x, flash_pos.y),
+		#Vector2(flash_pos.x + flash_size.x, flash_pos.y),
+		#Vector2(flash_pos.x + flash_size.x, flash_pos.y + flash_size.y / 2.0),
+		#Vector2(flash_pos.x, flash_pos.y + flash_size.y / 2.0),
+	#],
+	#[Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE], 
+	#[
+		#Vector2(0.0, 1.0),
+		#Vector2(0.0, 0.0),
+		#Vector2(0.5, 0.0),
+		#Vector2(0.5, 1.0),
+		#
+	#], flash_tex)
 	
 	#Judgement.
 	var judge_font = ThemeDB.fallback_font

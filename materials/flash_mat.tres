@@ -1,0 +1,11 @@
+[gd_resource type="ShaderMaterial" format=3 uid="uid://cp07ocgx22l81"]
+
+[ext_resource type="Shader" uid="uid://b4sp5uj7vfbf" path="res://shaders/flash_shader.gdshader" id="1_ceryc"]
+[ext_resource type="Texture2D" uid="uid://ddkqurfpsydhc" path="res://textures/flash.png" id="1_dfnvg"]
+[ext_resource type="Texture2D" uid="uid://c3of2lkpn3vym" path="res://textures/flash2.png" id="3_mvqya"]
+
+[resource]
+render_priority = 1
+shader = ExtResource("1_ceryc")
+shader_parameter/texture_albedo = Array[Texture2D]([ExtResource("1_dfnvg"), ExtResource("3_mvqya")])
+shader_parameter/albedo_texture_size = Vector2i(512, 512)
