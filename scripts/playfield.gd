@@ -10,7 +10,7 @@ const COLUMN_WIDTH : float = 0.7
 var column_start : float = 0
 var num_columns : int = InputHandler.key_count
 
-const RECEPTOR_OFFSET : float = 0.6
+const RECEPTOR_OFFSET : float = 0.7
 
 var key_press : Array[bool] = []
 var key_highlight : Array[float] = []
@@ -18,7 +18,6 @@ var key_highlight : Array[float] = []
 @onready var floor_mesh : MeshInstance3D = $Floor
 @onready var left_mesh : MeshInstance3D = $Left
 @onready var right_mesh : MeshInstance3D = $Right
-@onready var receptor_mesh : MeshInstance3D = $Receptor
 
 const NOTE_MAT = preload("res://materials/note_mat.tres")
 const HOLD_MAT = preload("res://materials/hold_mat.tres")
@@ -68,9 +67,9 @@ func get_column_center(column : int) -> float:
 	assert(column >= 0 && column < num_columns)
 	return column_start + (float((num_columns - column - 1)) * COLUMN_WIDTH)
 	
-func get_column_2d_point(column : int) -> Vector2:
+func get_column_2d_point(column : int, z_offset : float = 0.0) -> Vector2:
 	assert(column >= 0 && column < num_columns)
-	var p = Vector3(get_column_center(column), receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0)
+	var p = Vector3(get_column_center(column), 0.0, RECEPTOR_OFFSET + z_offset)
 	return get_viewport().get_camera_3d().unproject_position(p)
 	
 func get_2d_direction_right() -> Vector2:
@@ -79,7 +78,7 @@ func get_2d_direction_right() -> Vector2:
 	return p1.direction_to(p2)
 	
 func get_rightside_2d_point() -> Vector2:
-	return get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, receptor_mesh.position.y, receptor_mesh.position.z + receptor_mesh.scale.z / 2.0))
+	return get_viewport().get_camera_3d().unproject_position(Vector3(-field_width / 2.0, 0.0, RECEPTOR_OFFSET))
 
 func update_playfield_transform() -> void:
 	field_width = (COLUMN_WIDTH * num_columns) + (FIELD_EDGE * 2)
@@ -88,9 +87,6 @@ func update_playfield_transform() -> void:
 	
 	floor_mesh.scale = Vector3(field_width, 1, FIELD_LENGTH - FIELD_DESPAWN_POS)
 	floor_mesh.position = Vector3(0.0, 0, FIELD_DESPAWN_POS);
-	
-	receptor_mesh.scale = Vector3(field_width - 0.05, receptor_mesh.scale.y, receptor_mesh.scale.z)
-	receptor_mesh.position = Vector3(0.0, 0.01, RECEPTOR_OFFSET - receptor_mesh.scale.z / 2.0)
 	
 	left_mesh.scale = Vector3(left_mesh.scale.x, left_mesh.scale.y, FIELD_LENGTH)
 	left_mesh.position = Vector3((field_width / 2) + (left_mesh.scale.x / 2), left_mesh.position.y, (FIELD_LENGTH / 2))

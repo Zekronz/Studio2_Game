@@ -8,7 +8,7 @@ var flash_tex : Texture2D = preload("res://textures/flash.png")
 var spawned_notes : int = 0
 var hit_average : float = 0.0
 
-const JUDGE_TIME : float = 0.3
+const JUDGE_TIME_MUL : float = 2.5
 var judge_info : Array[Dictionary]
 
 var combo_str : String
@@ -20,22 +20,13 @@ var acc_val : float
 var progress_percentage : float
 var death_overlay : float
 
-var JUDGE_TEXT : Dictionary = {
-	Judge.PERFECT: "MAX",
-	Judge.GREAT: "GREAT",
-	Judge.GOOD: "GOOD",
-	Judge.OK: "OK",
-	Judge.BAD: "BAD",
-	Judge.MISS: "MISS",
-}
-
-var JUDGE_COLOR : Dictionary = {
-	Judge.PERFECT: Color(0.995, 0.719, 0.0, 1.0),
-	Judge.GREAT: Color(0.767, 0.925, 0.0, 1.0),
-	Judge.GOOD: Color(0.0, 0.722, 0.633, 1.0),
-	Judge.OK: Color(0.0, 0.0, 1.0),
-	Judge.BAD: Color(0.5, 0.5, 0.5),
-	Judge.MISS: Color(1.0, 0.0, 0.0)
+var JUDGE_TEX : Dictionary = {
+	Judge.PERFECT: preload("res://textures/judge_perfect.png"),
+	Judge.GREAT: preload("res://textures/judge_great.png"),
+	Judge.GOOD: preload("res://textures/judge_good.png"),
+	Judge.OK: preload("res://textures/judge_ok.png"),
+	Judge.BAD: preload("res://textures/judge_bad.png"),
+	Judge.MISS: preload("res://textures/judge_miss.png")
 }
 
 func _ready() -> void:
@@ -47,48 +38,28 @@ func _process(delta: float) -> void:
 	
 	for i in InputHandler.key_count:
 		if judge_info[i]["timer"] > 0:
-			judge_info[i]["timer"] -= delta
-			if judge_info[i]["timer"] <= 0.0:
-				pass
+			judge_info[i]["timer"] = max(0.0, judge_info[i]["timer"] - delta * JUDGE_TIME_MUL)
 				
 	queue_redraw()
 				
 func _draw() -> void:
 	var ui_scale = size.y / 1080.0
 	
-	#Flash.
-	#var flash_size : Vector2 = flash_tex.get_size() * ui_scale * 1.2
-	#var flash_offset = 6.0 * ui_scale
-	#var flash_pos = playfield.get_column_2d_point(4) - flash_size / 2.0 + flash_offset * Vector2.DOWN
-	#draw_texture_rect(flash_tex, Rect2(flash_pos.x, flash_pos.y, flash_size.x, flash_size.y), false)
-	#draw_primitive([
-		#Vector2(flash_pos.x, flash_pos.y),
-		#Vector2(flash_pos.x + flash_size.x, flash_pos.y),
-		#Vector2(flash_pos.x + flash_size.x, flash_pos.y + flash_size.y / 2.0),
-		#Vector2(flash_pos.x, flash_pos.y + flash_size.y / 2.0),
-	#],
-	#[Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE], 
-	#[
-		#Vector2(0.0, 1.0),
-		#Vector2(0.0, 0.0),
-		#Vector2(0.5, 0.0),
-		#Vector2(0.5, 1.0),
-		#
-	#], flash_tex)
-	
 	#Judgement.
-	var judge_font = ThemeDB.fallback_font
-	var judge_size = 50.0 * ui_scale
-	var judge_offset = 93.0 * ui_scale
+	var judge_scale = 0.45
+	var judge_offset = 0.3
 	
 	for i in InputHandler.key_count:
-		if judge_info[i]["timer"] <= 0.0:
+		var timer = judge_info[i]["timer"]
+		if timer <= 0.0:
 			continue
 			
 		var judge = judge_info[i]["judge"]
-		var s = judge_font.get_string_size(JUDGE_TEXT[judge], HORIZONTAL_ALIGNMENT_CENTER, -1, judge_size)
-		var p = playfield.get_column_2d_point(i) + Vector2(-(s.x / 2), -s.y + judge_font.get_ascent(judge_size) + judge_offset)		
-		draw_string(judge_font, p, JUDGE_TEXT[judge], HORIZONTAL_ALIGNMENT_CENTER, -1, judge_size, JUDGE_COLOR[judge])
+		var t = JUDGE_TEX[judge]
+		var s = t.get_size() * ui_scale * (judge_scale + timeline_smooth((1.0 - timer) * 3.0) * 0.1)
+		var p = playfield.get_column_2d_point(i, judge_offset) + Vector2(-(s.x / 2), -s.y)
+		var alpha = timeline_smooth(1.0 - timer, 0.2, 0.4)
+		draw_texture_rect(t, Rect2(p, s), false, Color(1.0, 1.0, 1.0, alpha))
 		
 	#Combo.
 	var combo_font = ThemeDB.fallback_font
@@ -163,7 +134,7 @@ func _draw() -> void:
 
 func set_judge(column, judge) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
-	judge_info[column]["timer"] = JUDGE_TIME;
+	judge_info[column]["timer"] = 1.0;
 	judge_info[column]["judge"] = judge;
 	
 func reset_judge() -> void:
@@ -191,8 +162,8 @@ func set_combo(combo : int) -> void:
 func set_health(health : float) -> void:
 	health_percentage = health
 
-func set_health_scale(scale : float) -> void:
-	health_scale = scale
+func set_health_scale(s : float) -> void:
+	health_scale = s
 
 func set_progress(progress : float) -> void:
 	progress_percentage = progress
@@ -215,3 +186,9 @@ func format_int_commas(num: int) -> String:
 		result = "-" + result
 
 	return result
+	
+func timeline_smooth(t : float, a : float = 1.3, b : float = 2.4) -> float:
+	t = clamp(t, 0.0, 1.0)
+	var t_peak = a / (a + b)
+	var max_val = (t_peak ** a) * ((1 - t_peak) ** b)
+	return (t ** a) * ((1 - t) ** b) / max_val

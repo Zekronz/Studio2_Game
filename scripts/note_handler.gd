@@ -6,6 +6,8 @@ extends Node
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
 #TODO: Song info ui display?
 #TODO: Movement: Striped hold notes, bar line, background?
+#TODO: Note about custom camera effect based on beats. Exploring camera movements and non-linear note movement.
+#TODO: Judgements above vs. below notes. Above harder to read, but only colors matter
 
 #V2:
 #Key press highlight 	[X]
@@ -35,10 +37,12 @@ extends Node
 #Camera start animation	[ ]
 #Show keybinds at start	[ ]
 #Combo effects			[ ]
+#Judgement art			[X]
 #Better ui art			[ ]
 #Better background		[ ]
+#Better sounds			[ ]
 
-const SCROLL_SPEED : float = 20.0
+const SCROLL_SPEED : float = 19.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -54,7 +58,7 @@ var hold_fx_scene : Resource = preload("res://scenes/hold_effect.tscn")
 
 var map_loaded : bool = false
 var hit_objects : Array;
-var column_pressed : int = 0
+var column_pressed : Array
 var total_single : int = 0
 var total_hold : int = 0
 var song_length : float = 0
@@ -80,6 +84,8 @@ var no_fail_mod : bool = false
 
 func _ready() -> void:
 	assert(note_group != null)
+	
+	column_pressed.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
 	
 	current_hold_notes.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
@@ -123,7 +129,8 @@ func _process(delta : float) -> void:
 	playfield.set_bar_length(time_to_physical_length(bar_length))
 	playfield.set_bar_offset(get_note_pos(bar_timing_offset))
 	
-	column_pressed = 0
+	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
+		column_pressed[i] = false
 	
 	for column_ind in playfield.num_columns:
 		var column = note_group.get_child(column_ind)
@@ -146,7 +153,7 @@ func _process(delta : float) -> void:
 					destroy_note(note)
 					continue
 			
-			if column_pressed & (1 << note.column):
+			if column_pressed[note.column]:
 				continue
 			
 			if not note.missed_start:
@@ -346,7 +353,7 @@ func handle_note_judgement_start(note) -> void:
 		press_key = (start_delta <= 0.0)
 		
 	if press_key and judge != Judge.MISS:
-		column_pressed |= (1 << note.column)
+		column_pressed[note.column] = true
 		note.set_pressed()
 		
 		if not note.is_hold:
@@ -375,7 +382,7 @@ func handle_note_judgement_end(note) -> void:
 		release_key = (end_delta <= 0.0)
 	
 	if release_key:
-		column_pressed |= (1 << note.column)
+		column_pressed[note.column] = true
 		note.set_holding(false)
 		
 		if judge == Judge.MISS:
@@ -419,7 +426,7 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 		#ui.set_combo(combo)
 	
 		if not dead:
-			#ui.set_judge(column, judge)
+			ui.set_judge(column, judge)
 		
 			if judge == Judge.MISS:
 				audio_handler.oneshot(audio_handler.miss_sound)

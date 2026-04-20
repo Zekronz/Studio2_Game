@@ -24,7 +24,6 @@ func update_values() -> void:
 	var ys3 = timeline_smooth(timer3)
 	var yys = timeline_smooth(timer1 * timer1)
 	var yl = timeline_linear(timer1)
-	var yl3 = timeline_linear(timer3)
 	
 	f1.scale = Vector3((0.3 + timer2 / 1.5) * 1.25, 1.0 - timer2, 1.0)
 	f3.scale = Vector3(1.027 - timer1 / 2.0, f3.scale.y, f3.scale.z)
