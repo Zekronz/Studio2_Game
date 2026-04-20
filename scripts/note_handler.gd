@@ -22,7 +22,7 @@ extends Node
 #Receptor pos			[X]
 #Better camera persp	[X]
 #Fade playfield			[X]
-#Bar lines				[ ]
+#Bar lines				[X]
 #Floor scrolling		[ ]
 #Better receptor		[X]
 #Scrolling visibility	[X]
@@ -38,7 +38,7 @@ extends Node
 #Better ui art			[ ]
 #Better background		[ ]
 
-const SCROLL_SPEED : float = 20.0
+const SCROLL_SPEED : float = 10.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -67,12 +67,15 @@ var combo : int = 0
 var health : float = 0.0
 var dead : bool = false
 
+var bar_length : float = 0.0
+var bar_timing_offset : float = 0.0
+
 var paused_pos : float = 0.0
 var pitch_multiplier : float = 1.0
 
 var current_hold_notes : Array[Node3D]
 
-var auto_mod : bool = true
+var auto_mod : bool = false
 var no_fail_mod : bool = false
 
 func _ready() -> void:
@@ -117,6 +120,9 @@ func _process(delta : float) -> void:
 	check_note_spawns()
 	
 	#Update note positions and handle judgements.
+	playfield.set_bar_length(time_to_physical_length(bar_length))
+	playfield.set_bar_offset(get_note_pos(bar_timing_offset))
+	
 	column_pressed = 0
 	
 	for column_ind in playfield.num_columns:
@@ -162,6 +168,18 @@ func load_map():
 	#aar map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
 	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
+
+	var timing_points = map["timing_points"]
+	if len(timing_points) > 0:
+		if len(timing_points) > 1:
+			print("WARNING: Unsupported BPM changes.")
+		
+		var t = timing_points[0]
+		bar_length = t["beat_length"] * 4.0 #TODO: Doesn't support other time signatures
+		bar_timing_offset = t["time"]
+		
+		playfield.set_bar_length(time_to_physical_length(bar_length))
+		playfield.set_bar_offset(get_note_pos(bar_timing_offset))
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -243,9 +261,13 @@ func check_note_spawns() -> void:
 	
 	ui.set_spawned_notes(num_notes)
 
+func time_to_physical_length(time : float) -> float:
+	return time * (SCROLL_SPEED / audio_handler.start_pitch)
+
 func get_note_pos(time : float) -> float:
 	var pos = paused_pos if audio_handler.stream_paused else audio_handler.get_pos()
-	return (time - pos - VISUAL_OFFSET) * (SCROLL_SPEED / audio_handler.start_pitch) + playfield.RECEPTOR_OFFSET
+	return time_to_physical_length(time - pos - VISUAL_OFFSET) + playfield.RECEPTOR_OFFSET
+	#return (time - pos - VISUAL_OFFSET) * (SCROLL_SPEED / audio_handler.start_pitch) + playfield.RECEPTOR_OFFSET
 
 func get_note_end_point(start_time : float, time_length : float = -1) -> float:
 	if time_length <= 0.0:

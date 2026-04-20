@@ -30,6 +30,8 @@ func _ready() -> void:
 	floor_mat.set_shader_parameter("field_edge", FIELD_EDGE)
 	floor_mat.set_shader_parameter("receptor_offset", RECEPTOR_OFFSET)
 	floor_mat.set_shader_parameter("key_count", num_columns)
+	floor_mat.set_shader_parameter("bar_length", 0.0)
+	floor_mat.set_shader_parameter("bar_offset", 0.0)
 	
 	NOTE_MAT.set_shader_parameter("size", Vector2(NoteInfo.HOLD_WIDTH, NoteInfo.NOTE_BASE_LENGTH))
 	HOLD_MAT.set_shader_parameter("receptor_offset", RECEPTOR_OFFSET)
@@ -96,3 +98,9 @@ func update_playfield_transform() -> void:
 	
 	right_mesh.scale = Vector3(right_mesh.scale.x, right_mesh.scale.y, FIELD_LENGTH)
 	right_mesh.position = Vector3(-(field_width / 2) - (right_mesh.scale.x / 2), right_mesh.position.y, (FIELD_LENGTH / 2))
+
+func set_bar_length(bar_length : float) -> void:
+	floor_mat.set_shader_parameter("bar_length", bar_length)
+
+func set_bar_offset(bar_offset : float) -> void:
+	floor_mat.set_shader_parameter("bar_offset", bar_offset)
