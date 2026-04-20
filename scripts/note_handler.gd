@@ -5,6 +5,7 @@ extends Node
 #TODO: How much info to display in middle of playfield vs. the side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
 #TODO: Song info ui display?
+#TODO: Movement: Striped hold notes, bar line, background?
 
 #V2:
 #Key press highlight 	[X]
@@ -23,9 +24,9 @@ extends Node
 #Fade playfield			[X]
 #Bar lines				[ ]
 #Better receptor		[X]
-#Scrolling visibility	[ ]
+#Scrolling visibility	[X]
 #Different note colors	[X]
-#Better note graphics 	[ ]
+#Better note graphics 	[X]
 #Particle effects		[X]
 #Combo effects			[ ]
 #Better ui art			[ ]
@@ -146,10 +147,10 @@ func load_map():
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
 		current_hold_notes[i] = null
 	
-	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
-	#var map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
+	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	#aar map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
+	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])

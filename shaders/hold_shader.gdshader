@@ -8,6 +8,9 @@ instance uniform uint color_ind;
 uniform float radius : hint_range(0.0, 1.0);
 uniform float border_thickness : hint_range(0.0, 0.1);
 uniform float border_glow : hint_range(1.0, 20.0);
+uniform float stripe_thickness : hint_range(0.0, 1.0) = 0.1;
+uniform float stripe_spacing : hint_range(0.0, 5.0) = 0.1;
+uniform float stripe_intesnity : hint_range(0.0, 1.0) = 0.2;
 
 instance uniform vec2 size = vec2(0.9, 3.0);
 uniform float receptor_offset;
@@ -37,7 +40,13 @@ float border_mix(float dist){
 vec4 fill_col(vec2 uv){
 	float p = min(uv.x, 1.0 - uv.x);
 	float a = smoothstep(0.0, 0.2, p);
-	return mix(colors[color_ind], colors[color_ind + 1U], pow(a, 0.6));
+	vec4 col = mix(colors[color_ind], colors[color_ind + 1U], pow(a, 0.6));
+	return col;
+}
+
+float stripe(vec2 uv){
+	float diag = step(mod(dot(uv * size, normalize(vec2(1.0))), stripe_spacing), stripe_thickness);
+	return diag;
 }
 
 void fragment() {
@@ -60,4 +69,6 @@ void fragment() {
 	ALPHA = clamp(inner.a + (holding * 0.4), 0.0, 1.0); //@TODO: Animate?
 	ALPHA *= max(0.25, (1.0 - missed));
 	ALPHA *= fade_out(v_pos.z);
+	
+	ALBEDO += stripe(UV) * (colors[color_ind + 2U].rgb * stripe_intesnity);
 }

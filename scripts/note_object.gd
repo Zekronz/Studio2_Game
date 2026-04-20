@@ -16,6 +16,20 @@ var hold : Node3D
 
 var hold_mesh : MeshInstance3D
 var hold_effect : Node3D
+var hold_fade : float = 0.0
+var miss_fade : float = 0.0
+
+func _process(delta : float) -> void:
+	if not is_hold:
+		return
+		
+	if holding and hold_fade < 1.0:
+		hold_fade = min(1.0, hold_fade + delta * 20.0)
+		hold_mesh.set_instance_shader_parameter("holding", hold_fade)
+		
+	elif (missed_start or missed_end) and miss_fade < 1.0:
+		miss_fade = min(1.0, miss_fade + delta * 20.0)
+		hold_mesh.set_instance_shader_parameter("missed", miss_fade)
 
 func init(column_ind : int, n_time : float, n_length : float, n_is_hold : bool, hold_length) -> void:
 	main = $Main
@@ -51,7 +65,7 @@ func set_holding(n_holding : bool) -> void:
 		return
 		
 	holding = n_holding
-	hold_mesh.set_instance_shader_parameter("holding", float(n_holding))
+	#hold_mesh.set_instance_shader_parameter("holding", float(n_holding))
 	
 	if not holding:
 		assert(hold_effect != null)
@@ -61,9 +75,9 @@ func set_holding(n_holding : bool) -> void:
 func set_missed_start() -> void:
 	missed_start = true
 	if is_hold:
-		hold_mesh.set_instance_shader_parameter("missed", 1.0)
+		hold_fade = 0
 
 func set_missed_end() -> void:
 	missed_end = true
 	if is_hold:
-		hold_mesh.set_instance_shader_parameter("missed", 1.0)
+		hold_fade = 0
