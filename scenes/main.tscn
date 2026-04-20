@@ -6,6 +6,7 @@
 [ext_resource type="PackedScene" uid="uid://df28ml7rjtd3o" path="res://scenes/playfield.tscn" id="4_jyhfs"]
 [ext_resource type="Script" uid="uid://d2lbtnetbldka" path="res://scripts/ui.gd" id="5_tbgi4"]
 [ext_resource type="Material" uid="uid://ctxl8h8c4ekyx" path="res://materials/bg_mat.tres" id="5_tefeu"]
+[ext_resource type="Script" uid="uid://celj8a5gitkud" path="res://scripts/camera.gd" id="6_o6xl0"]
 
 [sub_resource type="Environment" id="Environment_sugp2"]
 background_mode = 3
@@ -66,6 +67,7 @@ light_energy = 1.95
 transform = Transform3D(-1, 1.0955303e-14, 8.742278e-08, 5.3053625e-08, 0.7948067, 0.60686266, -6.94842e-08, 0.60686266, -0.7948067, 0, 2.5227208, -0.7481267)
 fov = 70.0
 far = 25.0
+script = ExtResource("6_o6xl0")
 
 [node name="Playfield" parent="." unique_id=1342724330 instance=ExtResource("4_jyhfs")]
 

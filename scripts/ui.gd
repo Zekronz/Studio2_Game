@@ -13,6 +13,7 @@ var judge_info : Array[Dictionary]
 
 var combo_str : String
 var health_percentage : float
+var health_scale : float
 var score_str : String
 var acc_str : String
 var acc_val : float
@@ -100,12 +101,12 @@ func _draw() -> void:
 		draw_string(combo_font, p, combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
 		
 	#Health bar.
-	var hp_hor_offset = 15.0 * ui_scale
-	var hp_ver_offset = 20.0 * ui_scale
+	var hp_hor_offset = 15.0 * ui_scale * health_scale
+	var hp_ver_offset = 20.0 * ui_scale * health_scale
 	var hp_dir = playfield.get_2d_direction_right()
 	var hp_pos = playfield.get_rightside_2d_point() + hp_hor_offset * Vector2.RIGHT + hp_ver_offset * hp_dir
-	var hp_width = 15.0 * ui_scale
-	var hp_length = 350.0 * ui_scale
+	var hp_width = 15.0 * ui_scale * health_scale
+	var hp_length = 350.0 * ui_scale * health_scale
 	var hp_bg = Color(0.0, 0.0, 0.0, 0.435)
 	
 	draw_primitive([
@@ -122,7 +123,7 @@ func _draw() -> void:
 		hp_pos + hp_width * Vector2.RIGHT + hp_dir * hp_length,
 		hp_pos + hp_dir * hp_length,
 		hp_pos
-	], Color.WHITE, 1.6 * ui_scale, true)
+	], Color.WHITE, 1.6 * ui_scale * health_scale, true)
 	
 	draw_primitive([
 		hp_pos,
@@ -158,7 +159,7 @@ func _draw() -> void:
 	
 	#Death overlay.
 	if death_overlay > 0.0:
-		draw_rect(Rect2(0, 0, size.x, size.y), Color(1.0, 0.0, 0.0, death_overlay * 0.5))
+		draw_rect(Rect2(0, 0, size.x, size.y), Color(0.5, 0.0, 0.05, death_overlay * 0.5))
 
 func set_judge(column, judge) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
@@ -189,6 +190,9 @@ func set_combo(combo : int) -> void:
 
 func set_health(health : float) -> void:
 	health_percentage = health
+
+func set_health_scale(scale : float) -> void:
+	health_scale = scale
 
 func set_progress(progress : float) -> void:
 	progress_percentage = progress

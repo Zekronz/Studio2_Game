@@ -23,18 +23,20 @@ extends Node
 #Better camera persp	[X]
 #Fade playfield			[X]
 #Bar lines				[ ]
+#Floor scrolling		[ ]
 #Better receptor		[X]
 #Scrolling visibility	[X]
 #Different note colors	[X]
 #Better note graphics 	[X]
 #Particle effects		[X]
+#Camera shake			[X]
+
+#V4
+#Camera start animation	[ ]
+#Show keybinds at start	[ ]
 #Combo effects			[ ]
 #Better ui art			[ ]
 #Better background		[ ]
-#Camera effects			[ ]
-
-#V4
-#Show keybinds at start	[ ]
 
 const SCROLL_SPEED : float = 20.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
@@ -42,6 +44,7 @@ const VISUAL_OFFSET : float = 0.0 / 1000.0
 @onready var audio_handler : Node = $AudioStreamPlayer
 @onready var ui : Control = $UI
 @onready var playfield : Node3D = $Playfield
+@onready var cam : Camera3D = $Camera
 @onready var note_group : Node3D = $Notes
 @onready var fx_group : Node3D = $FX
 
@@ -93,14 +96,22 @@ func _process(delta : float) -> void:
 				audio_handler.oneshot(audio_handler.hit_sound)
 		
 	if dead and not audio_handler.stream_paused and audio_handler.pitch_scale > 0:
-		var scale = max(0, audio_handler.pitch_scale - 0.7 * delta)
+		var scale = max(0, audio_handler.pitch_scale - 0.6 * delta)
 		if scale <= 0.0:
 			audio_handler.stream_paused = true
 			paused_pos = audio_handler.get_pos()
 			ui.set_death_overlay(1.0)
+			ui.set_health_scale(1.0 - 0.5)
+			cam.set_fov_offset(50.0)
 		else:
 			audio_handler.pitch_scale = scale
-			ui.set_death_overlay(clamp(1.0 - (scale / audio_handler.start_pitch), 0.0, 1.0))
+			
+			var d = clamp(1.0 - (scale / audio_handler.start_pitch), 0.0, 1.0)
+			var sd = smoothstep(0.0, 1.0, d)
+			
+			ui.set_death_overlay(d)
+			ui.set_health_scale(1.0 - sd * 0.5)
+			cam.set_fov_offset(smoothstep(0.0, 1.0, sd) * 50.0)
 		
 	update_progress()	
 	check_note_spawns()
@@ -147,10 +158,10 @@ func load_map():
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
 		current_hold_notes[i] = null
 	
-	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu")
+	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Epilogue].osu")
 	#aar map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
-	var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
+	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
 
 	InputHandler.key_count = map["key_count"]
 	playfield.set_num_columns(map["key_count"])
@@ -182,6 +193,7 @@ func load_map():
 	ui.set_hit_average(0)
 	ui.set_combo(0)
 	ui.set_health(health)
+	ui.set_health_scale(1.0)
 	ui.set_death_overlay(0)
 	ui.reset_judge()
 	update_progress()
@@ -378,6 +390,7 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 		
 		if judge == Judge.MISS:
 			combo = 0
+			cam.shake()
 		else:
 			combo += 1
 	
@@ -420,7 +433,7 @@ func spawn_hit_effect(column : int, hold : bool) -> Node3D:
 	assert(fx != null)
 	
 	fx.position = Vector3(playfield.get_column_center(column), 0.0, playfield.RECEPTOR_OFFSET)# - 0.0125);
-	fx.rotation = Vector3(-get_viewport().get_camera_3d().rotation.x, 0.0, 0.0)
+	fx.rotation = Vector3(-cam.rotation.x, 0.0, 0.0)
 	fx_group.add_child(fx)
 	
 	return fx
