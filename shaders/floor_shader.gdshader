@@ -7,7 +7,7 @@ uniform vec4 albedo : source_color;
 uniform vec3 highlight : source_color;
 uniform vec4 sep_color : source_color;
 
-uniform float field_width;
+uniform vec2 field_size;
 uniform float field_edge;
 uniform float fade_out_start;
 uniform float fade_out_end;
@@ -43,9 +43,12 @@ void fragment() {
 	vec4 v_pos = INV_VIEW_MATRIX * vec4(VERTEX, 1.0);
 	vec3 col = albedo.rgb;
 	
+	float stripe = step(mod(dot(vec2(v_pos.x, v_pos.z - bar_offset * 0.75), normalize(vec2(1.0))), 2), 1.0);
+	col += (vec3(0.43, 0.1, 0.17) * stripe * 0.01);
+	
 	float past_receptor = float(v_pos.z < receptor_offset);
 	
-	float fe = field_edge / field_width;
+	float fe = field_edge / field_size.x;
 	float fw = 1.0 - fe * 2.0;
 	float fx = (UV.x - fe) / fw;
 	

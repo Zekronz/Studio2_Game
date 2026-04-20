@@ -83,7 +83,6 @@ func get_rightside_2d_point() -> Vector2:
 
 func update_playfield_transform() -> void:
 	field_width = (COLUMN_WIDTH * num_columns) + (FIELD_EDGE * 2)
-	floor_mat.set_shader_parameter("field_width", field_width)
 	
 	column_start = -(float(num_columns) / 2.0 * COLUMN_WIDTH) + ((COLUMN_WIDTH / 2.0) * float(num_columns % 1 == 0))
 	
@@ -98,6 +97,8 @@ func update_playfield_transform() -> void:
 	
 	right_mesh.scale = Vector3(right_mesh.scale.x, right_mesh.scale.y, FIELD_LENGTH)
 	right_mesh.position = Vector3(-(field_width / 2) - (right_mesh.scale.x / 2), right_mesh.position.y, (FIELD_LENGTH / 2))
+
+	floor_mat.set_shader_parameter("field_size", Vector2(floor_mesh.scale.x, floor_mesh.scale.z))
 
 func set_bar_length(bar_length : float) -> void:
 	floor_mat.set_shader_parameter("bar_length", bar_length)

@@ -44,11 +44,6 @@ vec4 fill_col(vec2 uv){
 	return col;
 }
 
-float stripe(vec2 uv){
-	float diag = step(mod(dot(uv * size, normalize(vec2(1.0))), stripe_spacing), stripe_thickness);
-	return diag;
-}
-
 void fragment() {
 	float dist = round_dist(UV);
 	if(dist > 0.0) discard;
@@ -70,5 +65,5 @@ void fragment() {
 	ALPHA *= max(0.25, (1.0 - missed));
 	ALPHA *= fade_out(v_pos.z);
 	
-	ALBEDO += stripe(UV) * (colors[color_ind + 2U].rgb * stripe_intesnity);
+	ALBEDO += stripe(UV, size, stripe_spacing, stripe_thickness, 0.0) * (colors[color_ind + 2U].rgb * stripe_intesnity);
 }

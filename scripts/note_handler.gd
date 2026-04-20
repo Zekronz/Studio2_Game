@@ -23,7 +23,7 @@ extends Node
 #Better camera persp	[X]
 #Fade playfield			[X]
 #Bar lines				[X]
-#Floor scrolling		[ ]
+#Floor scrolling		[X]
 #Better receptor		[X]
 #Scrolling visibility	[X]
 #Different note colors	[X]
@@ -38,7 +38,7 @@ extends Node
 #Better ui art			[ ]
 #Better background		[ ]
 
-const SCROLL_SPEED : float = 10.0
+const SCROLL_SPEED : float = 20.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -75,7 +75,7 @@ var pitch_multiplier : float = 1.0
 
 var current_hold_notes : Array[Node3D]
 
-var auto_mod : bool = false
+var auto_mod : bool = true
 var no_fail_mod : bool = false
 
 func _ready() -> void:

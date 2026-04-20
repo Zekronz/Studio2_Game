@@ -10,3 +10,8 @@ vec3 bg_color(vec4 fg, vec2 uv){
 float fade_out(float pos){
 	return 1.0 - smoothstep(8.0, 20.0, pos);
 }
+
+float stripe(vec2 uv, vec2 size, float spacing, float thickness, float offset){
+	float diag = step(mod(dot(uv * size, normalize(vec2(1.0))) - offset, spacing), thickness);
+	return diag;
+}
