@@ -3,6 +3,7 @@ extends Control
 @onready var playfield = $"../Playfield"
 @onready var debug_label = $DebugLabel
 
+var font : Font = preload("res://fonts/Century Gothic.ttf")
 var flash_tex : Texture2D = preload("res://textures/flash.png")
 
 var spawned_notes : int = 0
@@ -10,6 +11,9 @@ var hit_average : float = 0.0
 
 const JUDGE_TIME_MUL : float = 2.5
 var judge_info : Array[Dictionary]
+
+const COMBO_TIME_MUL : float = 4.5
+var combo_timer : float = 0.0
 
 var combo_str : String
 var health_percentage : float
@@ -37,8 +41,11 @@ func _process(delta: float) -> void:
 	debug_label.text = "FPS: " + str(int(Engine.get_frames_per_second())) + "\nSpawned notes: " + str(spawned_notes) + "\nHit Average: " + str(hit_average * 1000.0).pad_decimals(2) + "ms"
 	
 	for i in InputHandler.key_count:
-		if judge_info[i]["timer"] > 0:
+		if judge_info[i]["timer"] > 0.0:
 			judge_info[i]["timer"] = max(0.0, judge_info[i]["timer"] - delta * JUDGE_TIME_MUL)
+			
+	if combo_timer > 0.0:
+		combo_timer = max(0.0, combo_timer - delta * COMBO_TIME_MUL)
 				
 	queue_redraw()
 				
@@ -62,8 +69,8 @@ func _draw() -> void:
 		draw_texture_rect(t, Rect2(p, s), false, Color(1.0, 1.0, 1.0, alpha))
 		
 	#Combo.
-	var combo_font = ThemeDB.fallback_font
-	var combo_size = 58.0 * ui_scale
+	var combo_font = font
+	var combo_size = 56.0 * ui_scale * (1.0 + timeline_smooth(1.0 - combo_timer) * 0.12)
 	var combo_offset = 320.0 * ui_scale
 		
 	if combo_str.length() > 0:
@@ -105,16 +112,16 @@ func _draw() -> void:
 	[ Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE ], [])
 	
 	#Score.
-	var score_font = ThemeDB.fallback_font
-	var score_size = 58.0 * ui_scale
+	var score_font = font
+	var score_size = 63.0 * ui_scale
 	var score_offset = 50.0 * ui_scale
 	
 	var score_str_size = score_font.get_string_size(score_str, HORIZONTAL_ALIGNMENT_CENTER, -1, score_size)
 	draw_string(score_font, Vector2(size.x - score_str_size.x - score_offset, score_font.get_ascent(score_size)), score_str, HORIZONTAL_ALIGNMENT_CENTER, -1, score_size)
 	
 	#Accuracy.
-	var acc_font = ThemeDB.fallback_font
-	var acc_size = 35.0 * ui_scale
+	var acc_font = font
+	var acc_size = 40.0 * ui_scale
 	var acc_offset = 20.0 * ui_scale
 	
 	var acc_str_size = acc_font.get_string_size(acc_str, HORIZONTAL_ALIGNMENT_CENTER, -1, acc_size)
@@ -156,8 +163,10 @@ func set_hit_average(average : float) -> void:
 func set_combo(combo : int) -> void:
 	if combo == 0:
 		combo_str = ""
+		combo_timer = 0.0
 	else:
 		combo_str = str(combo)
+		combo_timer = 1.0
 
 func set_health(health : float) -> void:
 	health_percentage = health

@@ -423,7 +423,7 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 		else:
 			combo += 1
 	
-		#ui.set_combo(combo)
+		ui.set_combo(combo)
 	
 		if not dead:
 			ui.set_judge(column, judge)
