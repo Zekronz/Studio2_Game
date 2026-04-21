@@ -8,6 +8,7 @@ extends Node
 #TODO: Movement: Striped hold notes, bar line, background?
 #TODO: Note about custom camera effect based on beats. Exploring camera movements and non-linear note movement.
 #TODO: Judgements above vs. below notes. Above harder to read, but only colors matter
+#TODO: Combo sound is abnoxious?
 
 #V2:
 #Key press highlight 	[X]
@@ -41,6 +42,11 @@ extends Node
 #Better ui art			[ ]
 #Better background		[ ]
 #Better sounds			[X]
+
+const map_str = "res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Epilogue].osu"
+#const map_str = "res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu"
+#const map_str = "res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu"
+#const map_str = "res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu"
 
 const SCROLL_SPEED : float = 19.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
@@ -81,7 +87,7 @@ var pitch_multiplier : float = 1.0
 
 var current_hold_notes : Array[Node3D]
 
-var auto_mod : bool = true
+var auto_mod : bool = false
 var no_fail_mod : bool = false
 
 func _ready() -> void:
@@ -93,11 +99,22 @@ func _ready() -> void:
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
 		current_hold_notes[i] = null
 	
-	load_map()
+	load_map(map_str)
 
 func _process(delta : float) -> void:
 	if not map_loaded:
 		return
+		
+	if dead and audio_handler.stream_paused:
+		if Input.is_action_just_pressed("restart"):
+			audio_handler.pitch_scale = audio_handler.start_pitch
+			audio_handler.stop()
+			ui.set_death_overlay(0.0)
+			ui.set_health_scale(1.0)
+			cam.set_fov_offset(0.0)
+			load_map(map_str)
+			audio_handler.play(0.0)
+			return
 		
 	if not auto_mod and not dead:
 		for key_ind in range(InputHandler.key_count):
@@ -164,7 +181,7 @@ func _process(delta : float) -> void:
 				elif not note.pressed:
 					handle_note_judgement_start(note)
 
-func load_map():
+func load_map(map_file):
 	map_loaded = false
 	
 	for column in note_group.get_children():
@@ -173,7 +190,8 @@ func load_map():
 	for i in InputHandler.MAX_SUPPORTED_KEY_COUNT:
 		current_hold_notes[i] = null
 	
-	var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Epilogue].osu")
+	var map = MapParser.load_map(map_file)
+	#var map = MapParser.load_map("res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Epilogue].osu")
 	#aar map = MapParser.load_map("res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu")
 	#var map = MapParser.load_map("res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu")
 	#var map = MapParser.load_map("res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu")
@@ -422,7 +440,7 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 		
 		if judge == Judge.MISS:
 			combo = 0
-			next_combo_milestone = 0
+			next_combo_milestone = COMBO_MILESTONE_STEP
 			cam.shake()
 		else:
 			combo += 1

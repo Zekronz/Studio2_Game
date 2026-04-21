@@ -154,6 +154,23 @@ func _draw() -> void:
 	#Death overlay.
 	if death_overlay > 0.0:
 		draw_rect(Rect2(0, 0, size.x, size.y), Color(0.5, 0.0, 0.05, death_overlay * 0.5))
+		
+	#Fail.
+	if death_overlay >= 1.0:
+		var fail_font = font
+		var fail_title_size = 100.0 * ui_scale
+		var fail_title_offset = -350.0 * ui_scale
+		
+		var fail_restart_size = 52.0 * ui_scale
+		var fail_restart_offset = 0# * ui_scale
+		
+		draw_text_centered(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_title_offset), "You Failed!", fail_title_size)
+		draw_text_centered(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_restart_offset), "Press 'R' to restart.", fail_restart_size)
+
+func draw_text_centered(str_font : Font, pos : Vector2, text : String, str_size : int, col : Color = Color(1, 1, 1, 1)) -> void:
+	var s = str_font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, str_size)
+	var str_pos = Vector2(pos.x - s.x / 2.0, pos.y + str_font.get_ascent(str_size) - s.y / 2.0)
+	draw_string(str_font, str_pos, text, HORIZONTAL_ALIGNMENT_CENTER, -1, str_size, col)
 
 func set_judge(column, judge) -> void:
 	assert(column >= 0 && column < InputHandler.key_count)
