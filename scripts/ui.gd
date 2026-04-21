@@ -28,6 +28,10 @@ var acc_val : float
 var progress_percentage : float
 var death_overlay : float
 
+const KEYBIND_TIME = 2.5
+var keybind_timer = KEYBIND_TIME
+var keybind_alpha = 1.0
+
 var JUDGE_TEX : Dictionary = {
 	Judge.PERFECT: preload("res://textures/judge_perfect.png"),
 	Judge.GREAT: preload("res://textures/judge_great.png"),
@@ -53,6 +57,11 @@ func _process(delta: float) -> void:
 			
 	if combo_milestone_timer > 0.0:
 		combo_milestone_timer = max(0.0, combo_milestone_timer - delta * COMBO_MILESTONE_TIME_MUL)
+				
+	if keybind_timer > 0.0:
+		keybind_timer = max(0.0, keybind_timer - delta)
+	else:
+		keybind_alpha = max(0.0, keybind_alpha - delta * 3.0)
 				
 	queue_redraw()
 				
@@ -127,6 +136,12 @@ func _draw() -> void:
 	],
 	[ Color.WHITE, Color.WHITE, Color.WHITE, Color.WHITE ], [])
 	
+	#Keybinds.
+	if keybind_alpha > 0.0 and death_overlay <= 0.0:
+		for i in InputHandler.key_count:
+			var key_code = OS.get_keycode_string(InputHandler.KEY_CODES[InputHandler.key_count - 1][i])
+			draw_text_align(font, playfield.get_column_2d_point(i) + 20.0 * ui_scale * Vector2.UP, key_code, 50.0 * ui_scale, 1, 2, Color(1.0, 1.0, 1.0, keybind_alpha))
+	
 	#Score.
 	var score_font = font
 	var score_size = 63.0 * ui_scale
@@ -164,12 +179,22 @@ func _draw() -> void:
 		var fail_restart_size = 52.0 * ui_scale
 		var fail_restart_offset = 0# * ui_scale
 		
-		draw_text_centered(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_title_offset), "You Failed!", fail_title_size)
-		draw_text_centered(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_restart_offset), "Press 'R' to restart.", fail_restart_size)
+		draw_text_align(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_title_offset), "You Failed!", fail_title_size, 1, 1)
+		draw_text_align(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_restart_offset), "Press 'R' to restart.", fail_restart_size, 1, 1)
 
-func draw_text_centered(str_font : Font, pos : Vector2, text : String, str_size : int, col : Color = Color(1, 1, 1, 1)) -> void:
+func draw_text_align(str_font : Font, pos : Vector2, text : String, str_size : int, hor : int, ver : int, col : Color = Color(1, 1, 1, 1)) -> void:
 	var s = str_font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, str_size)
-	var str_pos = Vector2(pos.x - s.x / 2.0, pos.y + str_font.get_ascent(str_size) - s.y / 2.0)
+	if hor == 0:
+		s.x = 0.0
+	elif hor == 1:
+		s.x /= 2.0
+	
+	if ver == 0:
+		s.y = 0.0
+	elif ver == 1:
+		s.y /= 2.0
+		
+	var str_pos = Vector2(pos.x - s.x, pos.y + str_font.get_ascent(str_size) - s.y)
 	draw_string(str_font, str_pos, text, HORIZONTAL_ALIGNMENT_CENTER, -1, str_size, col)
 
 func set_judge(column, judge) -> void:
@@ -217,6 +242,10 @@ func set_progress(progress : float) -> void:
 
 func set_death_overlay(amount : float) -> void:
 	death_overlay = amount
+
+func reset_keybind_display() -> void:
+	keybind_timer = KEYBIND_TIME
+	keybind_alpha = 1.0
 
 func format_int_commas(num: int) -> String:
 	var num_str: String = str(abs(num))

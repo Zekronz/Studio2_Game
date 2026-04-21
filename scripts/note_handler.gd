@@ -36,7 +36,7 @@ extends Node
 
 #V4
 #Camera start animation	[ ]
-#Show keybinds at start	[ ]
+#Show keybinds at start	[#]
 #Combo effects			[X]
 #Judgement art			[X]
 #Better ui art			[ ]
@@ -242,6 +242,7 @@ func load_map(map_file):
 	ui.set_health_scale(1.0)
 	ui.set_death_overlay(0)
 	ui.reset_judge()
+	ui.reset_keybind_display()
 	update_progress()
 	
 	check_note_spawns()
