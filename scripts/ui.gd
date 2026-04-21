@@ -15,6 +15,10 @@ var judge_info : Array[Dictionary]
 const COMBO_TIME_MUL : float = 4.5
 var combo_timer : float = 0.0
 
+const COMBO_MILESTONE_TIME_MUL : float = 1.75
+var combo_milestone_timer : float = 0.0
+var combo_milestone_str : String = ""
+
 var combo_str : String
 var health_percentage : float
 var health_scale : float
@@ -46,6 +50,9 @@ func _process(delta: float) -> void:
 			
 	if combo_timer > 0.0:
 		combo_timer = max(0.0, combo_timer - delta * COMBO_TIME_MUL)
+			
+	if combo_milestone_timer > 0.0:
+		combo_milestone_timer = max(0.0, combo_milestone_timer - delta * COMBO_MILESTONE_TIME_MUL)
 				
 	queue_redraw()
 				
@@ -70,21 +77,30 @@ func _draw() -> void:
 		
 	#Combo.
 	var combo_font = font
-	var combo_size = 56.0 * ui_scale * (1.0 + timeline_smooth(1.0 - combo_timer) * 0.12)
-	var combo_offset = 320.0 * ui_scale
+	var combo_size = 56.0 * ui_scale
+	var combo_offset = 350.0 * ui_scale
+		
+	if combo_milestone_str.length() > 0 and combo_milestone_timer > 0.0:
+		var cs = combo_size * (1.0 + (1.0 - combo_milestone_timer) * 1.2)
+		var s = combo_font.get_string_size(combo_milestone_str, HORIZONTAL_ALIGNMENT_CENTER, -1, cs)
+		var p = Vector2((size.x / 2.0 - s.x / 2.0), playfield.get_column_2d_point(0).y - combo_offset + combo_font.get_ascent(cs) / 2.0)
+		
+		var a = 1.0 - combo_milestone_timer
+		draw_string(combo_font, p, combo_milestone_str, HORIZONTAL_ALIGNMENT_CENTER, -1, cs, Color(1.0, 1.0, 1.0, (1.0 - (a * a)) * 0.4))
 		
 	if combo_str.length() > 0:
-		var s = combo_font.get_string_size(combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
-		var p = Vector2((size.x / 2.0 - s.x / 2.0), playfield.get_column_2d_point(0).y - combo_offset)
-		draw_string(combo_font, p, combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, combo_size)
+		var cs = combo_size * (1.0 + timeline_smooth(1.0 - combo_timer) * 0.12)
+		var s = combo_font.get_string_size(combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, cs)
+		var p = Vector2((size.x / 2.0 - s.x / 2.0), playfield.get_column_2d_point(0).y - combo_offset + combo_font.get_ascent(cs) / 2.0)
+		draw_string(combo_font, p, combo_str, HORIZONTAL_ALIGNMENT_CENTER, -1, cs)
 		
 	#Health bar.
 	var hp_hor_offset = 15.0 * ui_scale * health_scale
 	var hp_ver_offset = 20.0 * ui_scale * health_scale
 	var hp_dir = playfield.get_2d_direction_right()
 	var hp_pos = playfield.get_rightside_2d_point() + hp_hor_offset * Vector2.RIGHT + hp_ver_offset * hp_dir
-	var hp_width = 15.0 * ui_scale * health_scale
-	var hp_length = 350.0 * ui_scale * health_scale
+	var hp_width = 25.0 * ui_scale * health_scale
+	var hp_length = 400.0 * ui_scale * health_scale
 	var hp_bg = Color(0.0, 0.0, 0.0, 0.435)
 	
 	draw_primitive([
@@ -167,6 +183,11 @@ func set_combo(combo : int) -> void:
 	else:
 		combo_str = str(combo)
 		combo_timer = 1.0
+		
+func set_combo_milestone(milestone : int) -> void:
+	assert(milestone > 0)
+	combo_milestone_str = str(milestone)
+	combo_milestone_timer = 1.0
 
 func set_health(health : float) -> void:
 	health_percentage = health

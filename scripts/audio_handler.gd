@@ -3,6 +3,7 @@ extends AudioStreamPlayer
 @onready var sound_group = $"../Sounds"
 var hit_sound : AudioStream = preload("res://sounds/hit.wav")
 var miss_sound : AudioStream = preload("res://sounds/miss.wav")
+var combo_sound : AudioStream = preload("res://sounds/combo.wav")
 
 const BPM : float = 222.0
 var beat_length : float = (60.0 / BPM)
@@ -37,7 +38,7 @@ func on_finished() -> void:
 
 func oneshot(sound_stream) -> void:
 	var audio = AudioStreamPlayer.new()
-	audio.volume_db = -25;
+	audio.volume_db = -10;
 	audio.stream = sound_stream;
 	audio.finished.connect(oneshot_finished.bind(audio))
 	sound_group.add_child(audio)

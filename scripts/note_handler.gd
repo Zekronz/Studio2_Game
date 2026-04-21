@@ -36,11 +36,11 @@ extends Node
 #V4
 #Camera start animation	[ ]
 #Show keybinds at start	[ ]
-#Combo effects			[ ]
+#Combo effects			[X]
 #Judgement art			[X]
 #Better ui art			[ ]
 #Better background		[ ]
-#Better sounds			[ ]
+#Better sounds			[X]
 
 const SCROLL_SPEED : float = 19.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
@@ -68,6 +68,8 @@ var hit_score : int = 0
 var accuracy : float = 0
 var hit_deviation : float = 0
 var combo : int = 0
+const COMBO_MILESTONE_STEP : int = 100
+var next_combo_milestone : int = COMBO_MILESTONE_STEP
 var health : float = 0.0
 var dead : bool = false
 
@@ -208,6 +210,7 @@ func load_map():
 	accuracy = 1.0
 	hit_deviation = 0
 	combo = 0
+	next_combo_milestone = COMBO_MILESTONE_STEP
 	health = 0.75
 	dead = false
 	
@@ -419,9 +422,18 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 		
 		if judge == Judge.MISS:
 			combo = 0
+			next_combo_milestone = 0
 			cam.shake()
 		else:
 			combo += 1
+			var play_milestone = false
+			while combo >= next_combo_milestone:
+				play_milestone = true
+				ui.set_combo_milestone(next_combo_milestone)
+				next_combo_milestone += COMBO_MILESTONE_STEP
+				
+			if play_milestone:
+				audio_handler.oneshot(audio_handler.combo_sound)
 	
 		ui.set_combo(combo)
 	
