@@ -180,7 +180,7 @@ func _draw() -> void:
 		var fail_restart_offset = 0# * ui_scale
 		
 		draw_text_align(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_title_offset), "You Failed!", fail_title_size, 1, 1)
-		draw_text_align(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_restart_offset), "Press 'R' to restart.", fail_restart_size, 1, 1)
+		draw_text_align(fail_font, Vector2(size.x / 2.0, size.y / 2.0 + fail_restart_offset), "Press 'R' to restart", fail_restart_size, 1, 1)
 
 func draw_text_align(str_font : Font, pos : Vector2, text : String, str_size : int, hor : int, ver : int, col : Color = Color(1, 1, 1, 1)) -> void:
 	var s = str_font.get_string_size(text, HORIZONTAL_ALIGNMENT_CENTER, -1, str_size)

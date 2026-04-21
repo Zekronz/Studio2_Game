@@ -35,7 +35,7 @@ extends Node
 #Camera shake			[X]
 
 #V4
-#Camera start animation	[ ]
+#Camera start animation	[X]
 #Show keybinds at start	[#]
 #Combo effects			[X]
 #Judgement art			[X]
@@ -79,6 +79,9 @@ var next_combo_milestone : int = COMBO_MILESTONE_STEP
 var health : float = 0.0
 var dead : bool = false
 
+var cam_start_timer : float = 0.0
+var cam_start_offset : Vector3
+
 var bar_length : float = 0.0
 var bar_timing_offset : float = 0.0
 
@@ -93,6 +96,9 @@ var no_fail_mod : bool = false
 func _ready() -> void:
 	assert(note_group != null)
 	
+	cam_start_offset = Vector3(0.0, 0.5, -1.0)
+	cam.set_pos_offset(cam_start_offset)
+	
 	column_pressed.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
 	
 	current_hold_notes.resize(InputHandler.MAX_SUPPORTED_KEY_COUNT)
@@ -104,6 +110,9 @@ func _ready() -> void:
 func _process(delta : float) -> void:
 	if not map_loaded:
 		return
+	
+	cam_start_timer = min(1.0, cam_start_timer + delta / 20.0);
+	cam.set_pos_offset((1.0 - smoothstep(0.0, 1.0, cam_start_timer)) * cam.pos_offset)
 		
 	if dead and audio_handler.stream_paused:
 		if Input.is_action_just_pressed("restart"):
@@ -231,6 +240,9 @@ func load_map(map_file):
 	next_combo_milestone = COMBO_MILESTONE_STEP
 	health = 0.75
 	dead = false
+	
+	cam.set_pos_offset(cam_start_offset)
+	cam_start_timer = 0.0
 	
 	pitch_multiplier = 1.0
 	
