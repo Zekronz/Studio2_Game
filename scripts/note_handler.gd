@@ -2,12 +2,13 @@ extends Node
 
 #TODO: Judgement for each column? Too noisy?
 #TODO: 1 mill score? Or higher for more satisfaction?
-#TODO: How much info to display in middle of playfield vs. the side?
+#TODO: How much info to display in middle of playfield vs. th  side?
 #TODO: Temporal feedback, as in how strict timings affect satisfaction
 #TODO: Song info ui display?
 #TODO: Movement: Striped hold notes, bar line, background?
 #TODO: Note about custom camera effect based on beats. Exploring camera movements and non-linear note movement.
 #TODO: Judgements above vs. below notes. Above harder to read, but only colors matter
+#TODO: Show early vs late judgements.
 #TODO: Combo sound is abnoxious?
 
 #V2:
@@ -43,12 +44,12 @@ extends Node
 #Better background		[ ]
 #Better sounds			[X]
 
-const map_str = "res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Epilogue].osu"
+const map_str = "res://maps/Testify/void (Mournfinale) feat. Hoshikuma Minami - Testify (Kyousuke-) [Prologue].osu"
 #const map_str = "res://maps/Storm Buster/PLight - Storm Buster (Spy) [HARD].osu"
 #const map_str = "res://maps/Can You Hear Me/BEN - Can You Hear Me (Garalulu) [A World Between The Worlds].osu"
 #const map_str = "res://maps/Finixe/Silentroom - Finixe (shuniki) [YARANAIKA!!].osu"
 
-const SCROLL_SPEED : float = 19.0
+const SCROLL_SPEED : float = 10.0
 const VISUAL_OFFSET : float = 0.0 / 1000.0
 
 @onready var audio_handler : Node = $AudioStreamPlayer
@@ -108,6 +109,9 @@ func _ready() -> void:
 	load_map(map_str)
 
 func _process(delta : float) -> void:
+	if Input.is_action_just_pressed("quit"):
+		get_tree().quit()
+		
 	if not map_loaded:
 		return
 	
@@ -225,6 +229,7 @@ func load_map(map_file):
 		column.name = str(column_ind)
 		column.position = playfield.get_column_center(column_ind) * Vector3.RIGHT
 		note_group.add_child(column)
+		note_group.move_child(column, column_ind)
 	
 	hit_objects = map["hit_objects"]
 	
@@ -285,7 +290,7 @@ func check_note_spawns() -> void:
 				
 			var is_hold = (obj["time_length"] > 0)
 			if is_hold and Judge.time_behind(end_delta, Judge.BAD, audio_handler.start_pitch):
-					miss_end = true
+				miss_end = true
 					
 			if miss_start:
 				add_hit(column_ind, is_hold, false, Judge.MISS, start_delta, false)
@@ -297,8 +302,12 @@ func check_note_spawns() -> void:
 				spawn_note_at(obj["column"], obj["start_time"], obj["time_length"])
 	
 	var num_notes : int = 0
+	var column_ind : int = 0
 	for column in note_group.get_children():
 		num_notes += column.get_child_count()
+		column_ind += 1
+		if column_ind >= InputHandler.key_count:
+			break
 	
 	ui.set_spawned_notes(num_notes)
 
@@ -441,16 +450,6 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 	if user_hit:
 		total_hits += 1
 	
-		hit_score += Judge.SCORE[judge]
-		accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
-		ui.set_accuracy(accuracy)
-	
-		score = int(round((float(hit_score) / float((total_single + (total_hold * 2)) * Judge.SCORE[Judge.PERFECT])) * 1000000.0))
-		ui.set_score(score)
-	
-		hit_deviation += time_delta;
-		ui.set_hit_average(-(hit_deviation / float(total_hits)))
-		
 		if judge == Judge.MISS:
 			combo = 0
 			next_combo_milestone = COMBO_MILESTONE_STEP
@@ -468,6 +467,17 @@ func add_hit(column : int, is_hold : bool, is_release : bool, judge, time_delta 
 	
 		ui.set_combo(combo)
 	
+		hit_score += Judge.SCORE[judge]
+		accuracy = float(hit_score) / float(Judge.SCORE[Judge.PERFECT] * total_hits)
+		ui.set_accuracy(accuracy)
+	
+		#score = int(round((float(hit_score) / float((total_single + (total_hold * 2)) * Judge.SCORE[Judge.PERFECT])) * 1000000.0))
+		score += int(round(float(Judge.SCORE[judge] * max(1, combo)) / 100.0))
+		ui.set_score(score)
+	
+		hit_deviation += time_delta;
+		ui.set_hit_average(-(hit_deviation / float(total_hits)))
+		
 		if not dead:
 			ui.set_judge(column, judge)
 		

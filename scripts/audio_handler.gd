@@ -14,7 +14,7 @@ var is_finished : bool = false
 
 func _ready() -> void:
 	finished.connect(on_finished)
-	volume_db = -25.0
+	volume_db = -15.0
 	start_pitch = pitch_scale
 	play(0.0)
 
@@ -38,7 +38,7 @@ func on_finished() -> void:
 
 func oneshot(sound_stream) -> void:
 	var audio = AudioStreamPlayer.new()
-	audio.volume_db = -10;
+	audio.volume_db = -5;
 	audio.stream = sound_stream;
 	audio.finished.connect(oneshot_finished.bind(audio))
 	sound_group.add_child(audio)

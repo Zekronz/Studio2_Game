@@ -11,4 +11,4 @@ shader_parameter/border_thickness = 0.02400000114
 shader_parameter/border_glow = 6.0000002375
 shader_parameter/hit_bar_color = Color(1, 1, 1, 0.40392157)
 shader_parameter/hit_bar_size = 0.094000004465
-shader_parameter/size = Vector2(0, 0)
+shader_parameter/size = Vector2(1, 0.5)
